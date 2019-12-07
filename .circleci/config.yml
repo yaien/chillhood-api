@@ -10,10 +10,10 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        keys:
-          - v1-pkg-cache
+          keys:
+            - v1-pkg-cache
       - run: go test -v ./...
       - save_cache:
-        key: v1-pkg-cache
-        paths:
-         - "/go/pkg"
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
