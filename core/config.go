@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func address() string {
-	port := os.Getenv("PORT")
+	port := os.Getenv("ADDRESS")
 	if len(port) > 0 {
 		return port
 	}
