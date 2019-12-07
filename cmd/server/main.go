@@ -6,7 +6,7 @@ import "log"
 
 import "github.com/urfave/negroni"
 
-import "github.com/yaien/clothes-store-api/routes"
+import "github.com/yaien/clothes-store-api/api/routes"
 
 func main() {
 	app, err := core.NewApp()

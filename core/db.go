@@ -16,8 +16,8 @@ func connect(rawurl string) (*mongo.Database, error) {
 		return nil, err
 	}
 	opts := options.Client().ApplyURI(rawurl)
+
 	client, err := mongo.Connect(context.TODO(), opts)
-	err = client.Ping(context.TODO(), nil)
 	if err != nil {
 		return nil, err
 	}
