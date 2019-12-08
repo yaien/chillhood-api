@@ -1,12 +1,10 @@
 package controllers
 
-import "github.com/yaien/clothes-store-api/core"
-
 import "net/http"
 
 // Index Controller
 type Index struct {
-	core.Controller
+	*controller
 }
 
 func (c *Index) Get(w http.ResponseWriter, r *http.Request) {

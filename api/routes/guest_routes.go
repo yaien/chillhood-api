@@ -9,9 +9,8 @@ import (
 )
 
 func guest(router *mux.Router, app *core.App) {
-	controller := &controllers.GuestController{
-		Controller: &core.Controller{App: app},
-		Guests:     services.Guest(app.DB),
+	controller := &controllers.Guest{
+		Guests: services.Guest(app.DB),
 	}
 
 	router.HandleFunc("/api/v1/guests", controller.Create).Methods("POST")
