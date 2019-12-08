@@ -1,0 +1,49 @@
+package services
+
+import (
+	"context"
+	"github.com/yaien/clothes-store-api/api/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+// GuestService for made crud operations on guest collection
+type GuestService interface {
+	Create(guest *models.Guest) error
+	Get(id string) (*models.Guest, error)
+}
+
+type guestService struct {
+	collection *mongo.Collection
+}
+
+func (s *guestService) Create(guest *models.Guest) error {
+	guest.ID = primitive.NewObjectID()
+	_, err := s.collection.InsertOne(context.TODO(), guest)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *guestService) Get(id string) (*models.Guest, error) {
+	var guest models.Guest
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+	err = s.collection.FindOne(context.TODO(), filter).Decode(&guest)
+	if err != nil {
+		return nil, err
+	}
+	return &guest, nil
+}
+
+// Guest return a guest service instance
+func Guest(db *mongo.Database) GuestService {
+	return &guestService{
+		collection: db.Collection("guests"),
+	}
+}
