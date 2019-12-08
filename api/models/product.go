@@ -1,10 +1,10 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"errors"
 
-import "errors"
-
-import "strings"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Size struct {
 	Label     string `json:"label"`
@@ -28,7 +28,7 @@ func (p *Product) Size(label string) (*Size, error) {
 		return nil, errors.New("doesn't have sizes yet")
 	}
 	for _, size := range p.Sizes {
-		if strings.ToLower(size.Label) == strings.ToLower(label) {
+		if size.Label == label {
 			return size, nil
 		}
 	}
