@@ -2,19 +2,35 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-type Product struct {
-	ID          primitive.ObjectID `bson:"_id"`
-	Name        string
-	Price       int
-	Active      bool
-	Tags        []string
-	Pictures    []string
-	Description string
-	CreatedAt   int
-	Sizes       []Size
-}
+import "errors"
+
+import "strings"
 
 type Size struct {
-	Label     string
-	Existence int
+	Label     string `json:"label"`
+	Existence int    `json:"existence"`
+}
+
+type Product struct {
+	ID          primitive.ObjectID `bson:"_id" json:"id"`
+	Name        string             `json:"name"`
+	Price       int                `json:"price"`
+	Active      bool               `json:"active"`
+	Tags        []string           `json:"tags"`
+	Pictures    []string           `json:"pictures"`
+	Description string             `json:"description"`
+	CreatedAt   int                `json:"createdAt"`
+	Sizes       []*Size            `json:"sizes"`
+}
+
+func (p *Product) Size(label string) (*Size, error) {
+	if p.Sizes == nil {
+		return nil, errors.New("doesn't have sizes yet")
+	}
+	for _, size := range p.Sizes {
+		if strings.ToLower(size.Label) == strings.ToLower(label) {
+			return size, nil
+		}
+	}
+	return nil, errors.New("size not found")
 }
