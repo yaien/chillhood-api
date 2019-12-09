@@ -12,6 +12,7 @@ import (
 type GuestService interface {
 	Create(guest *models.Guest) error
 	Get(id string) (*models.Guest, error)
+	Update(guest *models.Guest) error
 }
 
 type guestService struct {
@@ -39,6 +40,16 @@ func (s *guestService) Get(id string) (*models.Guest, error) {
 		return nil, err
 	}
 	return &guest, nil
+}
+
+func (s *guestService) Update(guest *models.Guest) error {
+	filter := bson.M{"_id": guest.ID}
+	update := bson.M{"$set": guest}
+	_, err := s.collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // Guest return a guest service instance
