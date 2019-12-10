@@ -6,6 +6,7 @@ import (
 
 	"github.com/yaien/clothes-store-api/api/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,13 +21,13 @@ type indexService struct {
 func (s *indexService) Get(key string) string {
 	var index models.Index
 	filter := bson.M{"key": key}
-	update := bson.M{
-		"$inc": bson.M{
-			"value": 1,
-		},
+	update := bson.M{"$inc": bson.M{"value": 1}}
+	err := s.indexes.FindOne(context.TODO(), filter).Decode(&index)
+	if err != nil {
+		index = models.Index{ID: primitive.NewObjectID(), Key: key, Value: 0}
+		s.indexes.InsertOne(context.TODO(), index)
 	}
 	s.indexes.UpdateOne(context.TODO(), filter, update)
-	s.indexes.FindOne(context.TODO(), filter).Decode(&index)
 	return strconv.Itoa(index.Value)
 }
 
