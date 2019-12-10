@@ -1,14 +1,17 @@
 package controllers
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/yaien/clothes-store-api/api/helpers/response"
+)
 
 // Index Controller
 type Index struct {
-	*controller
 }
 
 func (c *Index) Get(w http.ResponseWriter, r *http.Request) {
-	c.Send(w, map[string]interface{}{
+	response.Send(w, map[string]interface{}{
 		"status": "ONLINE",
 	})
 }

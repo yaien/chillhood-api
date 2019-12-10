@@ -7,30 +7,30 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/yaien/clothes-store-api/api/helpers/response"
 	"github.com/yaien/clothes-store-api/api/models"
 	"github.com/yaien/clothes-store-api/api/services"
 )
 
 // Guest -> guest controller
 type Guest struct {
-	*controller
 	Guests services.GuestService
 }
 
 func (c *Guest) Create(w http.ResponseWriter, r *http.Request) {
 	guest := &models.Guest{}
 	if err := c.Guests.Create(guest); err != nil {
-		c.JSON(w, err, http.StatusInternalServerError)
+		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
-	c.Send(w, guest)
+	response.Send(w, guest)
 }
 
 func (c *Guest) Param(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	id := mux.Vars(r)["guest_id"]
 	guest, err := c.Guests.Get(id)
 	if err != nil {
-		c.Error(w, errors.New("GUEST_NOT_FOUND"), http.StatusNotFound)
+		response.Error(w, errors.New("GUEST_NOT_FOUND"), http.StatusNotFound)
 		return
 	}
 	ctx := context.WithValue(r.Context(), key("guest"), guest)
@@ -40,5 +40,5 @@ func (c *Guest) Param(w http.ResponseWriter, r *http.Request, next http.HandlerF
 
 func (c *Guest) Show(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value(key("guest")).(*models.Guest)
-	c.Send(w, guest)
+	response.Send(w, guest)
 }
