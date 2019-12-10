@@ -1,8 +1,9 @@
 package routes
 
-import "github.com/gorilla/mux"
-
-import "github.com/yaien/clothes-store-api/core"
+import (
+	"github.com/gorilla/mux"
+	"github.com/yaien/clothes-store-api/core"
+)
 
 // Register application routes
 func Register(app *core.App) *mux.Router {
@@ -11,6 +12,7 @@ func Register(app *core.App) *mux.Router {
 	guest(router, app)
 	cart(router, app)
 	product(router, app)
+	invoice(router, app)
 
 	return router
 }
