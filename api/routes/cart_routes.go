@@ -9,11 +9,11 @@ import (
 )
 
 func cart(router *mux.Router, app *core.App) {
-	cart := &controllers.Cart{
+	cart := &controllers.CartController{
 		Guests:   services.Guest(app.DB),
 		Products: services.Product(app.DB),
 	}
-	guest := &controllers.Guest{
+	guest := &controllers.GuestController{
 		Guests: services.Guest(app.DB),
 	}
 

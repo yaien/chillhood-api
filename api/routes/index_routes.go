@@ -7,6 +7,6 @@ import (
 )
 
 func index(router *mux.Router, app *core.App) {
-	ctrl := &controllers.Index{}
+	ctrl := &controllers.IndexController{}
 	router.HandleFunc("/", ctrl.Get)
 }

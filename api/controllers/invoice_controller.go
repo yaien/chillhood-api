@@ -11,11 +11,11 @@ import (
 	"github.com/yaien/clothes-store-api/api/services"
 )
 
-type Invoice struct {
+type InvoiceController struct {
 	Invoices services.InvoiceService
 }
 
-func (i *Invoice) Create(w http.ResponseWriter, r *http.Request) {
+func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 	var shipping models.Shipping
 	if err := json.NewDecoder(r.Body).Decode(&shipping); err != nil {
 		response.Error(w, err, http.StatusBadGateway)

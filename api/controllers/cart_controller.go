@@ -17,12 +17,12 @@ type payload struct {
 	Quantity int    `json:"quantity"`
 }
 
-type Cart struct {
+type CartController struct {
 	Guests   services.GuestService
 	Products services.ProductService
 }
 
-func (c *Cart) Add(w http.ResponseWriter, r *http.Request) {
+func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 	var data payload
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -83,7 +83,7 @@ func (c *Cart) Add(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (c *Cart) Remove(w http.ResponseWriter, r *http.Request) {
+func (c *CartController) Remove(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value(key("guest")).(*models.Guest)
 	product := mux.Vars(r)["product_id"]
 	if err := guest.Cart.Remove(product); err != nil {
