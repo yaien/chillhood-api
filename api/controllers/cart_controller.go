@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/yaien/clothes-store-api/api/helpers/response"
 	"github.com/yaien/clothes-store-api/api/models"
 	"github.com/yaien/clothes-store-api/api/services"
 )
@@ -17,7 +18,6 @@ type payload struct {
 }
 
 type Cart struct {
-	*controller
 	Guests   services.GuestService
 	Products services.ProductService
 }
@@ -26,31 +26,31 @@ func (c *Cart) Add(w http.ResponseWriter, r *http.Request) {
 	var data payload
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		c.Error(w, err, http.StatusBadRequest)
+		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
 	product, err := c.Products.Get(data.Product)
 
 	if err != nil {
-		c.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusBadRequest)
+		response.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusBadRequest)
 		return
 	}
 
 	if product.Sizes == nil {
-		c.Error(w, errors.New("PRODUCT_SOLD_OUT"), http.StatusBadRequest)
+		response.Error(w, errors.New("PRODUCT_SOLD_OUT"), http.StatusBadRequest)
 		return
 	}
 
 	size, err := product.Size(data.Size)
 
 	if err != nil {
-		c.Error(w, errors.New("SIZE_NOT_FOUND"), http.StatusBadRequest)
+		response.Error(w, errors.New("SIZE_NOT_FOUND"), http.StatusBadRequest)
 		return
 	}
 
 	if size.Existence < data.Quantity {
-		c.Error(w, errors.New("SIZE_SOLD_OUT"), http.StatusBadRequest)
+		response.Error(w, errors.New("SIZE_SOLD_OUT"), http.StatusBadRequest)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (c *Cart) Add(w http.ResponseWriter, r *http.Request) {
 	if guest.Cart == nil {
 		guest.Cart = &models.Cart{}
 	} else if guest.Cart.HasProduct(product.ID) {
-		c.Error(w, errors.New("PRODUCT_ALREADY_ADDED"), http.StatusBadRequest)
+		response.Error(w, errors.New("PRODUCT_ALREADY_ADDED"), http.StatusBadRequest)
 		return
 	}
 
@@ -75,11 +75,11 @@ func (c *Cart) Add(w http.ResponseWriter, r *http.Request) {
 	guest.Cart.Refresh()
 
 	if err = c.Guests.Update(guest); err != nil {
-		c.Error(w, err, http.StatusInternalServerError)
+		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	c.Send(w, guest.Cart)
+	response.Send(w, guest.Cart)
 
 }
 
@@ -87,13 +87,13 @@ func (c *Cart) Remove(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value(key("guest")).(*models.Guest)
 	product := mux.Vars(r)["product_id"]
 	if err := guest.Cart.Remove(product); err != nil {
-		c.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusNotFound)
+		response.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusNotFound)
 		return
 	}
 	guest.Cart.Refresh()
 	if err := c.Guests.Update(guest); err != nil {
-		c.Error(w, err, http.StatusInternalServerError)
+		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
-	c.Send(w, guest.Cart)
+	response.Send(w, guest.Cart)
 }
