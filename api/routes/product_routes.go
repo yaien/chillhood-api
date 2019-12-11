@@ -1,17 +1,15 @@
 package routes
 
-import "github.com/gorilla/mux"
-
-import "github.com/yaien/clothes-store-api/core"
-
-import "github.com/yaien/clothes-store-api/api/controllers"
-
-import "github.com/yaien/clothes-store-api/api/services"
-
-import "github.com/urfave/negroni"
+import (
+	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
+	"github.com/yaien/clothes-store-api/api/controllers"
+	"github.com/yaien/clothes-store-api/api/services"
+	"github.com/yaien/clothes-store-api/core"
+)
 
 func product(router *mux.Router, app *core.App) {
-	c := &controllers.Product{
+	c := &controllers.ProductController{
 		Products: services.Product(app.DB),
 	}
 

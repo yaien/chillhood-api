@@ -9,10 +9,10 @@ import (
 )
 
 func invoice(router *mux.Router, app *core.App) {
-	invoice := &controllers.Invoice{
+	invoice := &controllers.InvoiceController{
 		Invoices: services.NewInvoiceService(app.DB),
 	}
-	guest := &controllers.Guest{
+	guest := &controllers.GuestController{
 		Guests: services.Guest(app.DB),
 	}
 

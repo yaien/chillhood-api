@@ -9,7 +9,7 @@ import (
 )
 
 func guest(router *mux.Router, app *core.App) {
-	controller := &controllers.Guest{
+	controller := &controllers.GuestController{
 		Guests: services.Guest(app.DB),
 	}
 
