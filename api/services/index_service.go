@@ -21,13 +21,14 @@ type indexService struct {
 func (s *indexService) Get(key string) string {
 	var index models.Index
 	filter := bson.M{"key": key}
-	update := bson.M{"$inc": bson.M{"value": 1}}
 	err := s.indexes.FindOne(context.TODO(), filter).Decode(&index)
 	if err != nil {
-		index = models.Index{ID: primitive.NewObjectID(), Key: key, Value: 0}
+		index = models.Index{ID: primitive.NewObjectID(), Key: key, Value: 1}
 		s.indexes.InsertOne(context.TODO(), index)
+	} else {
+		update := bson.M{"$inc": bson.M{"value": 1}}
+		s.indexes.UpdateOne(context.TODO(), filter, update)
 	}
-	s.indexes.UpdateOne(context.TODO(), filter, update)
 	return strconv.Itoa(index.Value)
 }
 
