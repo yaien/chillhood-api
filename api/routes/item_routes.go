@@ -8,21 +8,21 @@ import (
 	"github.com/yaien/clothes-store-api/core"
 )
 
-func product(router *mux.Router, app *core.App) {
-	c := &controllers.ProductController{
-		Products: services.Product(app.DB),
+func item(router *mux.Router, app *core.App) {
+	c := &controllers.ItemController{
+		Items: services.NewItemService(app.DB),
 	}
 
-	router.HandleFunc("/api/v1/products", c.Create).Methods("POST")
+	router.HandleFunc("/api/v1/items", c.Create).Methods("POST")
 
-	router.HandleFunc("/api/v1/products", c.Find).Methods("GET")
+	router.HandleFunc("/api/v1/items", c.Find).Methods("GET")
 
-	router.Handle("/api/v1/products/{product_id}", negroni.New(
+	router.Handle("/api/v1/items/{item_id}", negroni.New(
 		negroni.HandlerFunc(c.Param),
 		negroni.WrapFunc(c.Show),
 	)).Methods("GET")
 
-	router.Handle("/api/v1/products/{product_id}", negroni.New(
+	router.Handle("/api/v1/items/{item_id}", negroni.New(
 		negroni.HandlerFunc(c.Param),
 		negroni.WrapFunc(c.Update),
 	)).Methods("PUT")

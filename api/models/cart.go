@@ -1,30 +1,21 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"fmt"
 
-import "errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // Cart -> Shopping cart of the client
 type Cart struct {
-	Shipping int     `json:"shipping"`
-	Subtotal int     `json:"subtotal"`
-	Total    int     `json:"total"`
-	Items    []*Item `json:"items"`
+	Shipping int         `json:"shipping"`
+	Subtotal int         `json:"subtotal"`
+	Total    int         `json:"total"`
+	Items    []*CartItem `json:"items"`
 }
 
-// HasProduct -> return true if the card has an item with current productID
-func (c *Cart) HasProduct(productID primitive.ObjectID) bool {
-	hex := productID.Hex()
-	for _, item := range c.Items {
-		if item.Product.Hex() == hex {
-			return true
-		}
-	}
-	return false
-}
-
-// Refresh -> update the cart subtotal and total with the current items
-func (c *Cart) Refresh() {
+// refresh -> update the cart subtotal and total with the current items
+func (c *Cart) refresh() {
 	c.Subtotal = 0
 	for _, item := range c.Items {
 		c.Subtotal += item.Price * item.Quantity
@@ -32,23 +23,37 @@ func (c *Cart) Refresh() {
 	c.Total = c.Subtotal + c.Shipping
 }
 
-// Remove -> get and item of the cart
-func (c *Cart) Remove(product string) error {
-	length := len(c.Items)
-	for index, item := range c.Items {
-		if item.Product.Hex() == product {
-			c.Items[index] = c.Items[length-1]
-			c.Items = c.Items[:length-1]
-			return nil
+// HasItem -> return true if the card has an item with current productID
+func (c *Cart) HasItem(id primitive.ObjectID) bool {
+	hex := id.Hex()
+	for _, item := range c.Items {
+		if item.ID.Hex() == hex {
+			return true
 		}
 	}
-	return errors.New("product does not exist in cart")
+	return false
 }
 
-type Item struct {
-	Product  primitive.ObjectID `json:"product"`
-	Name     string             `json:"name"`
-	Price    int                `json:"price"`
-	Quantity int                `json:"quantity"`
-	Size     string             `json:"size"`
+// AddItem -> add an item to the cart
+func (c *Cart) AddItem(item *CartItem) error {
+	if c.HasItem(item.ID) {
+		return fmt.Errorf("product '%s' is already added to the cart", item.ID.Hex())
+	}
+	c.Items = append(c.Items, item)
+	c.refresh()
+	return nil
+}
+
+// RemoveItem -> remove an item of the cart
+func (c *Cart) RemoveItem(id primitive.ObjectID) bool {
+	length := len(c.Items)
+	for index, item := range c.Items {
+		if item.ID.Hex() == id.Hex() {
+			c.Items[index] = c.Items[length-1]
+			c.Items = c.Items[:length-1]
+			c.refresh()
+			return true
+		}
+	}
+	return false
 }

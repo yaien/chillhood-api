@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/yaien/clothes-store-api/api/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -9,19 +10,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type ProductService interface {
-	Create(product *models.Product) error
-	Get(id string) (*models.Product, error)
-	Update(product *models.Product) error
-	Find() ([]*models.Product, error)
+type ItemService interface {
+	Create(product *models.Item) error
+	Get(id string) (*models.Item, error)
+	Update(product *models.Item) error
+	Find() ([]*models.Item, error)
 }
 
-type productService struct {
+type itemService struct {
 	collection *mongo.Collection
 }
 
-func (p *productService) Create(product *models.Product) error {
+func (p *itemService) Create(product *models.Item) error {
 	product.ID = primitive.NewObjectID()
+	product.CreatedAt = time.Now().Unix()
 	_, err := p.collection.InsertOne(context.TODO(), product)
 	if err != nil {
 		return err
@@ -29,8 +31,8 @@ func (p *productService) Create(product *models.Product) error {
 	return nil
 }
 
-func (p *productService) Get(id string) (*models.Product, error) {
-	var product models.Product
+func (p *itemService) Get(id string) (*models.Item, error) {
+	var product models.Item
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -42,24 +44,24 @@ func (p *productService) Get(id string) (*models.Product, error) {
 	return &product, nil
 }
 
-func (p *productService) Find() ([]*models.Product, error) {
-	var products []*models.Product
+func (p *itemService) Find() ([]*models.Item, error) {
+	var items []*models.Item
 	cursor, err := p.collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	for cursor.Next(context.TODO()) {
-		var product models.Product
+		var product models.Item
 		err := cursor.Decode(&product)
 		if err != nil {
 			return nil, err
 		}
-		products = append(products, &product)
+		items = append(items, &product)
 	}
-	return products, nil
+	return items, nil
 }
 
-func (p *productService) Update(product *models.Product) error {
+func (p *itemService) Update(product *models.Item) error {
 	filter := bson.M{"_id": product.ID}
 	update := bson.M{"$set": product}
 	_, err := p.collection.UpdateOne(context.TODO(), filter, update)
@@ -69,6 +71,6 @@ func (p *productService) Update(product *models.Product) error {
 	return nil
 }
 
-func Product(db *mongo.Database) ProductService {
-	return &productService{db.Collection("products")}
+func NewItemService(db *mongo.Database) ItemService {
+	return &itemService{db.Collection("items")}
 }
