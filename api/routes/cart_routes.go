@@ -10,19 +10,19 @@ import (
 
 func cart(router *mux.Router, app *core.App) {
 	cart := &controllers.CartController{
-		Guests:   services.Guest(app.DB),
-		Products: services.Product(app.DB),
+		Guests: services.Guest(app.DB),
+		Items:  services.NewItemService(app.DB),
 	}
 	guest := &controllers.GuestController{
 		Guests: services.Guest(app.DB),
 	}
 
-	router.Handle("/api/v1/guests/{guest_id}/products", negroni.New(
+	router.Handle("/api/v1/guests/{guest_id}/items", negroni.New(
 		negroni.HandlerFunc(guest.Param),
 		negroni.WrapFunc(cart.Add),
 	)).Methods("POST")
 
-	router.Handle("/api/v1/guests/{guest_id}/products/{product_id}", negroni.New(
+	router.Handle("/api/v1/guests/{guest_id}/items/{item_id}", negroni.New(
 		negroni.HandlerFunc(guest.Param),
 		negroni.WrapFunc(cart.Remove),
 	)).Methods("DELETE")

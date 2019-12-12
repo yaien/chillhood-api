@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/gorilla/mux"
 	"github.com/yaien/clothes-store-api/api/helpers/response"
 	"github.com/yaien/clothes-store-api/api/models"
@@ -12,14 +14,14 @@ import (
 )
 
 type payload struct {
-	Product  string `json:"product"`
+	ID       string `json:"id"`
 	Size     string `json:"size"`
 	Quantity int    `json:"quantity"`
 }
 
 type CartController struct {
-	Guests   services.GuestService
-	Products services.ProductService
+	Guests services.GuestService
+	Items  services.ItemService
 }
 
 func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +32,7 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, err := c.Products.Get(data.Product)
+	product, err := c.Items.Get(data.ID)
 
 	if err != nil {
 		response.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusBadRequest)
@@ -56,8 +58,8 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 
 	guest := r.Context().Value(key("guest")).(*models.Guest)
 
-	item := &models.Item{
-		Product:  product.ID,
+	item := &models.CartItem{
+		ID:       product.ID,
 		Name:     product.Name,
 		Price:    product.Price,
 		Quantity: data.Quantity,
@@ -66,31 +68,29 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 
 	if guest.Cart == nil {
 		guest.Cart = &models.Cart{}
-	} else if guest.Cart.HasProduct(product.ID) {
+	}
+	if err := guest.Cart.AddItem(item); err != nil {
 		response.Error(w, errors.New("PRODUCT_ALREADY_ADDED"), http.StatusBadRequest)
 		return
 	}
-
-	guest.Cart.Items = append(guest.Cart.Items, item)
-	guest.Cart.Refresh()
-
 	if err = c.Guests.Update(guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
-
 	response.Send(w, guest.Cart)
-
 }
 
 func (c *CartController) Remove(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value(key("guest")).(*models.Guest)
-	product := mux.Vars(r)["product_id"]
-	if err := guest.Cart.Remove(product); err != nil {
-		response.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusNotFound)
+	itemID, err := primitive.ObjectIDFromHex(mux.Vars(r)["item_id"])
+	if err != nil {
+		response.Error(w, errors.New("INVALID_ITEM_ID"), http.StatusNotFound)
 		return
 	}
-	guest.Cart.Refresh()
+	if !guest.Cart.RemoveItem(itemID) {
+		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
+		return
+	}
 	if err := c.Guests.Update(guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return

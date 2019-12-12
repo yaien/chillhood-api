@@ -11,7 +11,7 @@ func Register(app *core.App) *mux.Router {
 	index(router, app)
 	guest(router, app)
 	cart(router, app)
-	product(router, app)
+	item(router, app)
 	invoice(router, app)
 
 	return router
