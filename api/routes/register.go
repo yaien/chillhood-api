@@ -13,6 +13,7 @@ func Register(app *core.App) *mux.Router {
 	cart(router, app)
 	item(router, app)
 	invoice(router, app)
+	epayco(router, app)
 
 	return router
 }

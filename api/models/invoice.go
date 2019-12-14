@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/yaien/clothes-store-api/api/helpers/epayco"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -13,9 +14,11 @@ type Invoice struct {
 	Shipping  *Shipping          `json:"shipping"`
 	Status    InvoiceStatus      `json:"status"`
 	CreatedAt int64              `json:"createdAt"`
+	Payment   *epayco.Payment    `json:"payment"`
 }
 
 const (
+	Created  InvoiceStatus = "created"
 	Accepted InvoiceStatus = "accepted"
 	Rejected InvoiceStatus = "rejected"
 	Pending  InvoiceStatus = "pending"

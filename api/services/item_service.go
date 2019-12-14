@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/yaien/clothes-store-api/api/models"
@@ -15,6 +16,8 @@ type ItemService interface {
 	Get(id string) (*models.Item, error)
 	Update(product *models.Item) error
 	Find() ([]*models.Item, error)
+	Decrement(id string, size string, quantity int) error
+	Increment(id string, size string, quantity int) error
 }
 
 type itemService struct {
@@ -25,10 +28,7 @@ func (p *itemService) Create(product *models.Item) error {
 	product.ID = primitive.NewObjectID()
 	product.CreatedAt = time.Now().Unix()
 	_, err := p.collection.InsertOne(context.TODO(), product)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (p *itemService) Get(id string) (*models.Item, error) {
@@ -38,14 +38,11 @@ func (p *itemService) Get(id string) (*models.Item, error) {
 		return nil, err
 	}
 	err = p.collection.FindOne(context.TODO(), bson.M{"_id": _id}).Decode(&product)
-	if err != nil {
-		return nil, err
-	}
-	return &product, nil
+	return &product, err
 }
 
 func (p *itemService) Find() ([]*models.Item, error) {
-	var items []*models.Item
+	items := []*models.Item{}
 	cursor, err := p.collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return nil, err
@@ -65,10 +62,38 @@ func (p *itemService) Update(product *models.Item) error {
 	filter := bson.M{"_id": product.ID}
 	update := bson.M{"$set": product}
 	_, err := p.collection.UpdateOne(context.TODO(), filter, update)
+	return err
+}
+
+func (p *itemService) Decrement(id string, size string, quantity int) error {
+	item, err := p.Get(id)
 	if err != nil {
 		return err
 	}
-	return nil
+	sz, err := item.Size(size)
+	if err != nil {
+		return err
+	}
+	if sz.Existence < quantity {
+		return errors.New("INVALID_QUANTITY")
+	}
+
+	sz.Existence -= quantity
+	return p.Update(item)
+}
+
+func (p *itemService) Increment(id string, size string, quantity int) error {
+	item, err := p.Get(id)
+	if err != nil {
+		return err
+	}
+	sz, err := item.Size(size)
+	if err != nil {
+		return err
+	}
+
+	sz.Existence += quantity
+	return p.Update(item)
 }
 
 func NewItemService(db *mongo.Database) ItemService {

@@ -16,9 +16,10 @@ func invoice(router *mux.Router, app *core.App) {
 		Guests: services.Guest(app.DB),
 	}
 
-	router.Handle("/api/v1/guests/{guest_id}/invoice", negroni.New(
+	router.Handle("/api/v1/guests/{guest_id}/invoices", negroni.New(
 		negroni.HandlerFunc(guest.Param),
 		negroni.WrapFunc(invoice.Create),
 	)).Methods("POST")
 
+	router.HandleFunc("/api/v1/invoices/{invoice_ref}", invoice.Show).Methods("GET")
 }
