@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"github.com/teris-io/shortid"
+	"strings"
 	"time"
 
 	"github.com/yaien/clothes-store-api/api/models"
@@ -23,7 +24,7 @@ type invoiceService struct {
 
 func (s *invoiceService) Create(invoice *models.Invoice) error {
 	invoice.ID = primitive.NewObjectID()
-	invoice.Ref = shortid.MustGenerate()
+	invoice.Ref = strings.ToUpper(shortid.MustGenerate())
 	invoice.CreatedAt = time.Now().Unix()
 	invoice.Status = models.Created
 	_, err := s.invoices.InsertOne(context.TODO(), invoice)
