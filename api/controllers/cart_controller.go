@@ -35,12 +35,12 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 	product, err := c.Items.Get(data.ID)
 
 	if err != nil {
-		response.Error(w, errors.New("PRODUCT_NOT_FOUND"), http.StatusBadRequest)
+		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusBadRequest)
 		return
 	}
 
 	if product.Sizes == nil {
-		response.Error(w, errors.New("PRODUCT_SOLD_OUT"), http.StatusBadRequest)
+		response.Error(w, errors.New("ITEM_SOLD_OUT"), http.StatusBadRequest)
 		return
 	}
 

@@ -12,6 +12,7 @@ type Cart struct {
 	Subtotal int         `json:"subtotal"`
 	Total    int         `json:"total"`
 	Items    []*CartItem `json:"items"`
+	Executed bool        `json:"-"`
 }
 
 // refresh -> update the cart subtotal and total with the current items
