@@ -1,0 +1,16 @@
+version: "3"
+services: 
+    clothes-store-api:
+        build: .
+        env_file: cmd/server/.env
+        environment: 
+            MONGO_URI: "mongodb://mongo:27017/store"
+        container_name: clothes-store-api
+        ports: 
+            - "8080:8080"
+        depends_on: 
+            - mongo
+    mongo:
+        image: mongo
+        ports: 
+            - "27017:27017"
