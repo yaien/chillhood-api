@@ -1,0 +1,3 @@
+.circleci
+cmd/server/.env
+cmd/server/server
