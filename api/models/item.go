@@ -14,6 +14,7 @@ type Size struct {
 type Item struct {
 	ID          primitive.ObjectID `bson:"_id" json:"id"`
 	Name        string             `json:"name"`
+	Slug        string             `json:"slug"`
 	Price       int                `json:"price"`
 	Active      bool               `json:"active"`
 	Tags        []string           `json:"tags"`
