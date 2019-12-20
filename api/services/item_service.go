@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/gosimple/slug"
 	"github.com/yaien/clothes-store-api/api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,10 +25,11 @@ type itemService struct {
 	collection *mongo.Collection
 }
 
-func (p *itemService) Create(product *models.Item) error {
-	product.ID = primitive.NewObjectID()
-	product.CreatedAt = time.Now().Unix()
-	_, err := p.collection.InsertOne(context.TODO(), product)
+func (p *itemService) Create(item *models.Item) error {
+	item.ID = primitive.NewObjectID()
+	item.CreatedAt = time.Now().Unix()
+	item.Slug = slug.Make(item.Name)
+	_, err := p.collection.InsertOne(context.TODO(), item)
 	return err
 }
 
@@ -59,6 +61,7 @@ func (p *itemService) Find() ([]*models.Item, error) {
 }
 
 func (p *itemService) Update(product *models.Item) error {
+	product.Slug = slug.Make(product.Name)
 	filter := bson.M{"_id": product.ID}
 	update := bson.M{"$set": product}
 	_, err := p.collection.UpdateOne(context.TODO(), filter, update)
