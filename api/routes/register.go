@@ -10,10 +10,10 @@ func Register(app *core.App) *mux.Router {
 	router := mux.NewRouter()
 	index(router, app)
 	guest(router, app)
+	auth(router, app)
 	cart(router, app)
 	item(router, app)
 	invoice(router, app)
 	epayco(router, app)
-
 	return router
 }

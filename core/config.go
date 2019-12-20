@@ -2,7 +2,9 @@ package core
 
 import (
 	"github.com/joho/godotenv"
+	"log"
 	"os"
+	"time"
 )
 
 type EpaycoConfig struct {
@@ -12,12 +14,18 @@ type EpaycoConfig struct {
 	Test       bool
 }
 
+type JWTConfig struct {
+	Secret []byte
+	Duration time.Duration
+}
+
 // Config -> environment variable settings
 type Config struct {
 	Production bool
 	MongoURI   string
 	Address    string
 	Epayco     EpaycoConfig
+	JWT        JWTConfig
 }
 
 func address() string {
@@ -28,7 +36,15 @@ func address() string {
 	return ":8080"
 }
 
-// NewConfig -> get a configuarion instance
+func expiration(env string) time.Duration {
+	value, err := time.ParseDuration(env)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return value
+}
+
+// NewConfig -> get a configuration instance
 func load() *Config {
 	godotenv.Load()
 	return &Config{
@@ -40,6 +56,10 @@ func load() *Config {
 			CustomerID: os.Getenv("EPAYCO_CUSTOMER_ID"),
 			PublicKey:  os.Getenv("EPAYCO_PUBLIC_KEY"),
 			Test:       os.Getenv("EPAYCO_TEST_MODE") != "false",
+		},
+		JWT: JWTConfig{
+			Secret:     []byte(os.Getenv("JWT_SECRET")),
+			Duration: expiration(os.Getenv("JWT_DURATION")),
 		},
 	}
 }
