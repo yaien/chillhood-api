@@ -53,8 +53,8 @@ func (s *guestService) Update(guest *models.Guest) error {
 	return err
 }
 
-// Guest return a guest service instance
-func Guest(db *mongo.Database) GuestService {
+// NewGuestService return a guest service instance
+func NewGuestService(db *mongo.Database) GuestService {
 	return &guestService{
 		collection: db.Collection("guests"),
 	}

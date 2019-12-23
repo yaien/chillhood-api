@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/yaien/clothes-store-api/api/helpers/auth"
 	"github.com/yaien/clothes-store-api/core"
@@ -10,6 +11,7 @@ import (
 
 type TokenService interface {
 	FromPassword(login *auth.Login) (*auth.Response, error)
+	Decode(token string) (*jwt.StandardClaims, error)
 }
 
 type tokenService struct {
@@ -46,6 +48,19 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 	}
 
 	return response, nil
+}
+
+func (s *tokenService) Decode(tokenStr string) (*jwt.StandardClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return s.Config.Secret, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return token.Claims.(*jwt.StandardClaims), nil
 }
 
 func NewTokenService(config core.JWTConfig, users UserService) TokenService {

@@ -4,13 +4,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 	"github.com/yaien/clothes-store-api/api/controllers"
-	"github.com/yaien/clothes-store-api/api/services"
-	"github.com/yaien/clothes-store-api/core"
 )
 
-func item(router *mux.Router, app *core.App) {
+func item(router *mux.Router, mod *module) {
 	c := &controllers.ItemController{
-		Items: services.NewItemService(app.DB),
+		Items: mod.service.items,
 	}
 
 	router.HandleFunc("/api/v1/items", c.Create).Methods("POST")

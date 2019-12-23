@@ -1,2 +1,3 @@
-cmd/server/.env
-cmd/server/server
+*/**/.env
+cmd/store/store
+.idea
