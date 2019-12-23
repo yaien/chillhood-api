@@ -11,4 +11,5 @@ func epayco(router *mux.Router, mod *module) {
 		Cart:    mod.service.carts,
 	}
 	router.HandleFunc("/api/v1/epayco/response", c.Response).Methods("GET")
+	router.HandleFunc("/api/v1/epayco/checkout", c.Checkout).Methods("GET")
 }

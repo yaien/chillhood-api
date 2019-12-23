@@ -88,3 +88,7 @@ func (e *EpaycoController) Response(w http.ResponseWriter, r *http.Request) {
 	response.Send(w, invoice)
 
 }
+
+func (e *EpaycoController) Checkout(w http.ResponseWriter, r *http.Request) {
+	response.Send(w, e.Epayco.CheckoutArgs())
+}
