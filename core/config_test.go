@@ -6,14 +6,14 @@ import "os"
 
 func TestAddress(t *testing.T) {
 	os.Setenv("ADDRESS", "")
-	config := load()
-	if config.Address != ":8080" {
-		t.Errorf("expected server address to be :8080, received %s", config.Address)
+	addr := address()
+	if addr != ":8080" {
+		t.Errorf("expected server address to be :8080, received %s", addr)
 	}
-	addr := ":5000"
-	os.Setenv("ADDRESS", addr)
-	config = load()
-	if config.Address != addr {
-		t.Errorf("expected server address to be %s, received %s", addr, config.Address)
+	envAddr := ":5000"
+	os.Setenv("ADDRESS", envAddr)
+	addr = address()
+	if addr != envAddr {
+		t.Errorf("expected server address to be %s, received %s", envAddr, addr)
 	}
 }
