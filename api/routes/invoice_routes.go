@@ -4,16 +4,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 	"github.com/yaien/clothes-store-api/api/controllers"
-	"github.com/yaien/clothes-store-api/api/services"
-	"github.com/yaien/clothes-store-api/core"
 )
 
-func invoice(router *mux.Router, app *core.App) {
+func invoice(router *mux.Router, mod *module) {
 	invoice := &controllers.InvoiceController{
-		Invoices: services.NewInvoiceService(app.DB),
+		Invoices: mod.service.invoices,
 	}
 	guest := &controllers.GuestController{
-		Guests: services.Guest(app.DB),
+		Guests: mod.service.guests,
 	}
 
 	router.Handle("/api/v1/guests/{guest_id}/invoices", negroni.New(

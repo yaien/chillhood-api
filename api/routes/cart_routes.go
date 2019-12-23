@@ -4,17 +4,15 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 	"github.com/yaien/clothes-store-api/api/controllers"
-	"github.com/yaien/clothes-store-api/api/services"
-	"github.com/yaien/clothes-store-api/core"
 )
 
-func cart(router *mux.Router, app *core.App) {
+func cart(router *mux.Router, mod *module) {
 	cart := &controllers.CartController{
-		Guests: services.Guest(app.DB),
-		Items:  services.NewItemService(app.DB),
+		Guests: mod.service.guests,
+		Items:  mod.service.items,
 	}
 	guest := &controllers.GuestController{
-		Guests: services.Guest(app.DB),
+		Guests: mod.service.guests,
 	}
 
 	router.Handle("/api/v1/guests/{guest_id}/items", negroni.New(

@@ -2,17 +2,13 @@ package routes
 
 import "github.com/gorilla/mux"
 
-import "github.com/yaien/clothes-store-api/core"
-
 import "github.com/yaien/clothes-store-api/api/controllers"
 
-import "github.com/yaien/clothes-store-api/api/services"
-
-func epayco(router *mux.Router, app *core.App) {
+func epayco(router *mux.Router, mod *module) {
 	c := &controllers.EpaycoController{
-		Epayco:  services.NewEpaycoService(app.Config.Epayco),
-		Invoice: services.NewInvoiceService(app.DB),
-		Cart:    services.NewCartService(services.NewItemService(app.DB)),
+		Epayco:  mod.service.epayco,
+		Invoice: mod.service.invoices,
+		Cart:    mod.service.carts,
 	}
 	router.HandleFunc("/api/v1/epayco/response", c.Response).Methods("GET")
 }

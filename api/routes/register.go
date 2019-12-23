@@ -8,12 +8,13 @@ import (
 // Register application routes
 func Register(app *core.App) *mux.Router {
 	router := mux.NewRouter()
-	index(router, app)
-	guest(router, app)
-	cart(router, app)
-	item(router, app)
-	invoice(router, app)
-	epayco(router, app)
-
+	mod := bundle(app)
+	index(router, mod)
+	guest(router, mod)
+	auth(router, mod)
+	cart(router, mod)
+	item(router, mod)
+	invoice(router, mod)
+	epayco(router, mod)
 	return router
 }
