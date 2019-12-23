@@ -3,9 +3,9 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY ./ ./
-RUN GOOS=linux CGO_ENABLED=0 go build ./cmd/server
+RUN GOOS=linux CGO_ENABLED=0 go build ./cmd/store
 
 FROM scratch
 WORKDIR /app
-COPY --from=builder /app/server .
-ENTRYPOINT [ "/app/server" ]
+COPY --from=builder /app/store .
+CMD [ "/app/store", "serve" ]
