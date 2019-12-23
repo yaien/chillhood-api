@@ -30,6 +30,15 @@ type Response struct {
 	Data    *Payment `json:"data"`
 }
 
+// CheckoutArgs -> checkout information needed to start a redirect to epayco checkout
+type CheckoutArgs struct {
+	Key          string `json:"key"`
+	Test         bool   `json:"test"`
+	Response     string `json:"response"`
+	Confirmation string `json:"confirmation"`
+}
+
+// ResponseCode payment response code
 type ResponseCode int
 
 const (
