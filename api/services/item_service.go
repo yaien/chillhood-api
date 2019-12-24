@@ -16,7 +16,8 @@ type ItemService interface {
 	Create(product *models.Item) error
 	Get(id string) (*models.Item, error)
 	Update(product *models.Item) error
-	Find() ([]*models.Item, error)
+	Find(filter interface{}) ([]*models.Item, error)
+	FindOne(filter interface{}) (*models.Item, error)
 	Decrement(id string, size string, quantity int) error
 	Increment(id string, size string, quantity int) error
 }
@@ -34,18 +35,23 @@ func (p *itemService) Create(item *models.Item) error {
 }
 
 func (p *itemService) Get(id string) (*models.Item, error) {
-	var product models.Item
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	err = p.collection.FindOne(context.TODO(), bson.M{"_id": _id}).Decode(&product)
-	return &product, err
+	filter := bson.M{"_id": _id}
+	return p.FindOne(filter)
 }
 
-func (p *itemService) Find() ([]*models.Item, error) {
+func (p *itemService) FindOne(filter interface{}) (*models.Item, error) {
+	var item models.Item
+	err := p.collection.FindOne(context.TODO(), filter).Decode(&item)
+	return &item, err
+}
+
+func (p *itemService) Find(filter interface{}) ([]*models.Item, error) {
 	items := []*models.Item{}
-	cursor, err := p.collection.Find(context.TODO(), bson.M{})
+	cursor, err := p.collection.Find(context.TODO(), filter)
 	if err != nil {
 		return nil, err
 	}

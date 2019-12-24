@@ -14,7 +14,7 @@ func invoice(router *mux.Router, mod *module) {
 		Guests: mod.service.guests,
 	}
 
-	router.Handle("/api/v1/guests/{guest_id}/invoices", negroni.New(
+	router.Handle("/api/v1/public/guests/{guest_id}/invoices", negroni.New(
 		negroni.HandlerFunc(guest.Param),
 		negroni.WrapFunc(invoice.Create),
 	)).Methods("POST")

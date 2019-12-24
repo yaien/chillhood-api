@@ -15,12 +15,12 @@ func cart(router *mux.Router, mod *module) {
 		Guests: mod.service.guests,
 	}
 
-	router.Handle("/api/v1/guests/{guest_id}/items", negroni.New(
+	router.Handle("/api/v1/public/guests/{guest_id}/items", negroni.New(
 		negroni.HandlerFunc(guest.Param),
 		negroni.WrapFunc(cart.Add),
 	)).Methods("POST")
 
-	router.Handle("/api/v1/guests/{guest_id}/items/{item_id}", negroni.New(
+	router.Handle("/api/v1/public/guests/{guest_id}/items/{item_id}", negroni.New(
 		negroni.HandlerFunc(guest.Param),
 		negroni.WrapFunc(cart.Remove),
 	)).Methods("DELETE")
