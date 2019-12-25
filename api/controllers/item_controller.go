@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/yaien/clothes-store-api/api/helpers/response"
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/gorilla/mux"
 	"github.com/yaien/clothes-store-api/api/models"
@@ -33,12 +34,31 @@ func (p *ItemController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *ItemController) Find(w http.ResponseWriter, r *http.Request) {
-	items, err := p.Items.Find()
+	items, err := p.Items.Find(bson.M{})
 	if err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 	response.Send(w, items)
+}
+
+func (p *ItemController) FindActive(w http.ResponseWriter, r *http.Request) {
+	items, err := p.Items.Find(bson.M{"active": true})
+	if err != nil {
+		response.Error(w, err, http.StatusInternalServerError)
+		return
+	}
+	response.Send(w, items)
+}
+
+func (p *ItemController) Slug(w http.ResponseWriter, r *http.Request) {
+	slug := mux.Vars(r)["item_slug"]
+	item, err := p.Items.FindOne(bson.M{"slug": slug})
+	if err != nil {
+		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
+		return
+	}
+	response.Send(w, item)
 }
 
 func (p *ItemController) Param(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

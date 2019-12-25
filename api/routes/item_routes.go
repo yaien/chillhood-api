@@ -11,6 +11,9 @@ func item(router *mux.Router, mod *module) {
 		Items: mod.service.items,
 	}
 
+	router.HandleFunc("/api/v1/public/items", c.FindActive).Methods("GET")
+	router.HandleFunc("/api/v1/public/items/{item_slug}", c.Slug).Methods("GET")
+
 	router.HandleFunc("/api/v1/items", c.Create).Methods("POST")
 
 	router.HandleFunc("/api/v1/items", c.Find).Methods("GET")
