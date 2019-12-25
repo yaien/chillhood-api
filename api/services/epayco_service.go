@@ -19,7 +19,7 @@ type EpaycoService interface {
 }
 
 type epaycoService struct {
-	config  core.EpaycoConfig
+	config  *core.EpaycoConfig
 	baseURL *url.URL
 }
 
@@ -59,6 +59,6 @@ func (e *epaycoService) CheckoutArgs() *epayco.CheckoutArgs {
 	}
 }
 
-func NewEpaycoService(config core.EpaycoConfig, baseURL *url.URL) EpaycoService {
+func NewEpaycoService(config *core.EpaycoConfig, baseURL *url.URL) EpaycoService {
 	return &epaycoService{config, baseURL}
 }
