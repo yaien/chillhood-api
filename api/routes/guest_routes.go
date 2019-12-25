@@ -11,8 +11,8 @@ func guest(router *mux.Router, mod *module) {
 		Guests: mod.service.guests,
 	}
 
-	router.HandleFunc("/api/v1/guests", controller.Create).Methods("POST")
-	router.Handle("/api/v1/guests/{guest_id}", negroni.New(
+	router.HandleFunc("/api/v1/public/guests", controller.Create).Methods("POST")
+	router.Handle("/api/v1/public/guests/{guest_id}", negroni.New(
 		negroni.HandlerFunc(controller.Param),
 		negroni.WrapFunc(controller.Show),
 	)).Methods("GET")
