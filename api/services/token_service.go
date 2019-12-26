@@ -1,12 +1,14 @@
 package services
 
 import (
+	"errors"
 	"fmt"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/yaien/clothes-store-api/api/helpers/auth"
 	"github.com/yaien/clothes-store-api/core"
 	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 type TokenService interface {
@@ -17,9 +19,15 @@ type TokenService interface {
 type tokenService struct {
 	Users  UserService
 	Config *core.JWTConfig
+	Client *core.ClientConfig
 }
 
 func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
+
+	if login.ClientID != s.Client.Key {
+		return nil, errors.New("INVALID_CLIENT_CREDENTIALS")
+	}
+
 	user, err := s.Users.FindOne(bson.M{"email": login.Username})
 	if err != nil {
 		return nil, err
@@ -62,6 +70,6 @@ func (s *tokenService) Decode(tokenStr string) (*jwt.StandardClaims, error) {
 	return token.Claims.(*jwt.StandardClaims), nil
 }
 
-func NewTokenService(config *core.JWTConfig, users UserService) TokenService {
-	return &tokenService{users, config}
+func NewTokenService(client *core.ClientConfig, config *core.JWTConfig, users UserService) TokenService {
+	return &tokenService{users, config, client}
 }
