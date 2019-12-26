@@ -20,14 +20,20 @@ type JWTConfig struct {
 	Duration time.Duration
 }
 
+type ClientConfig struct {
+	Key    string
+	Origin string
+}
+
 // Config -> environment variable settings
 type Config struct {
 	Production bool
 	MongoURI   string
 	Address    string
 	BaseURL    *url.URL
-	Epayco     EpaycoConfig
-	JWT        JWTConfig
+	Epayco     *EpaycoConfig
+	JWT        *JWTConfig
+	Client     *ClientConfig
 }
 
 func address() string {
@@ -62,15 +68,19 @@ func load() *Config {
 		MongoURI:   os.Getenv("MONGO_URI"),
 		Address:    address(),
 		BaseURL:    baseURL(os.Getenv("BASE_URL")),
-		Epayco: EpaycoConfig{
+		Epayco: &EpaycoConfig{
 			Key:        os.Getenv("EPAYCO_KEY"),
 			CustomerID: os.Getenv("EPAYCO_CUSTOMER_ID"),
 			PublicKey:  os.Getenv("EPAYCO_PUBLIC_KEY"),
 			Test:       os.Getenv("EPAYCO_TEST_MODE") != "false",
 		},
-		JWT: JWTConfig{
+		JWT: &JWTConfig{
 			Secret:   []byte(os.Getenv("JWT_SECRET")),
 			Duration: expiration(os.Getenv("JWT_DURATION")),
+		},
+		Client: &ClientConfig{
+			Key:    os.Getenv("CLIENT_KEY"),
+			Origin: os.Getenv("CLIENT_ORIGIN"),
 		},
 	}
 }

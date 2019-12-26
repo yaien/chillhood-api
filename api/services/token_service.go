@@ -15,10 +15,9 @@ type TokenService interface {
 }
 
 type tokenService struct {
-	Users UserService
-	Config core.JWTConfig
+	Users  UserService
+	Config *core.JWTConfig
 }
-
 
 func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 	user, err := s.Users.FindOne(bson.M{"email": login.Username})
@@ -63,6 +62,6 @@ func (s *tokenService) Decode(tokenStr string) (*jwt.StandardClaims, error) {
 	return token.Claims.(*jwt.StandardClaims), nil
 }
 
-func NewTokenService(config core.JWTConfig, users UserService) TokenService {
+func NewTokenService(config *core.JWTConfig, users UserService) TokenService {
 	return &tokenService{users, config}
 }
