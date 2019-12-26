@@ -4,6 +4,8 @@ import "testing"
 
 import "net/url"
 
+import "github.com/yaien/clothes-store-api/core"
+
 func TestCheckoutArgs(t *testing.T) {
 	testcases := []struct {
 		baseURL      string
@@ -27,7 +29,7 @@ func TestCheckoutArgs(t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		service := &epaycoService{baseURL: baseURL}
+		service := &epaycoService{baseURL: baseURL, config: &core.EpaycoConfig{}}
 		args := service.CheckoutArgs()
 
 		if args.Response != testcase.response {
