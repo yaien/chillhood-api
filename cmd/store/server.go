@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
 	"github.com/yaien/clothes-store-api/api/routes"
 	"github.com/yaien/clothes-store-api/core"
-	"log"
 )
 
 func server() *cobra.Command {
@@ -20,7 +21,7 @@ func server() *cobra.Command {
 			}
 			server := negroni.Classic()
 			server.Use(cors.New(cors.Options{
-				AllowedOrigins: []string{app.Config.Client.Origin},
+				AllowedOrigins: app.Config.Client.Origins,
 			}))
 			router := routes.Register(app)
 			server.UseHandler(router)

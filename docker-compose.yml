@@ -4,8 +4,8 @@ services:
     build: .
     env_file: cmd/store/.env
     environment:
-      ADDRESS: ":8080"
-      MONGO_URI: "mongodb://mongo:27017/store"
+      PORT: 8080
+      MONGODB_URI: "mongodb://mongo:27017/store"
     container_name: clothes-store-api
     ports:
       - "8080:8080"

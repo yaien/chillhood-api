@@ -1,11 +1,14 @@
 package core
 
 import (
-	"github.com/joho/godotenv"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type EpaycoConfig struct {
@@ -21,8 +24,8 @@ type JWTConfig struct {
 }
 
 type ClientConfig struct {
-	Key    string
-	Origin string
+	Keys    []string
+	Origins []string
 }
 
 // Config -> environment variable settings
@@ -37,9 +40,9 @@ type Config struct {
 }
 
 func address() string {
-	port := os.Getenv("ADDRESS")
+	port := os.Getenv("PORT")
 	if len(port) > 0 {
-		return port
+		return fmt.Sprintf(":%s", port)
 	}
 	return ":8080"
 }
@@ -65,7 +68,7 @@ func load() *Config {
 	godotenv.Load()
 	return &Config{
 		Production: os.Getenv("GO_ENV") == "production",
-		MongoURI:   os.Getenv("MONGO_URI"),
+		MongoURI:   os.Getenv("MONGODB_URI"),
 		Address:    address(),
 		BaseURL:    baseURL(os.Getenv("BASE_URL")),
 		Epayco: &EpaycoConfig{
@@ -79,8 +82,8 @@ func load() *Config {
 			Duration: expiration(os.Getenv("JWT_DURATION")),
 		},
 		Client: &ClientConfig{
-			Key:    os.Getenv("CLIENT_KEY"),
-			Origin: os.Getenv("CLIENT_ORIGIN"),
+			Keys:    strings.Split(os.Getenv("CLIENT_KEY"), ","),
+			Origins: strings.Split(os.Getenv("CLIENT_ORIGIN"), ","),
 		},
 	}
 }

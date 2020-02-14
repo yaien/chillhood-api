@@ -22,9 +22,18 @@ type tokenService struct {
 	Client *core.ClientConfig
 }
 
+func (s *tokenService) isClientKeyValid(clientKey string) bool {
+	for _, key := range s.Client.Keys {
+		if key == clientKey {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 
-	if login.ClientID != s.Client.Key {
+	if !s.isClientKeyValid(login.ClientID) {
 		return nil, errors.New("INVALID_CLIENT_CREDENTIALS")
 	}
 
