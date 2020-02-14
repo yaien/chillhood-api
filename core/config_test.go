@@ -1,19 +1,20 @@
 package core
 
-import "testing"
-
-import "os"
+import (
+	"os"
+	"testing"
+)
 
 func TestAddress(t *testing.T) {
-	os.Setenv("ADDRESS", "")
+	os.Setenv("PORT", "")
 	addr := address()
 	if addr != ":8080" {
 		t.Errorf("expected server address to be :8080, received %s", addr)
 	}
-	envAddr := ":5000"
-	os.Setenv("ADDRESS", envAddr)
+	port := "5000"
+	os.Setenv("PORT", port)
 	addr = address()
-	if addr != envAddr {
-		t.Errorf("expected server address to be %s, received %s", envAddr, addr)
+	if addr != ":"+port {
+		t.Errorf("expected server address to be %s, received %s", port, addr)
 	}
 }
