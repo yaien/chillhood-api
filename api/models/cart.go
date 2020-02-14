@@ -15,8 +15,8 @@ type Cart struct {
 	Executed bool        `json:"-"`
 }
 
-// refresh -> update the cart subtotal and total with the current items
-func (c *Cart) refresh() {
+// Refresh -> update the cart subtotal and total with the current items
+func (c *Cart) Refresh() {
 	c.Subtotal = 0
 	for _, item := range c.Items {
 		c.Subtotal += item.Price * item.Quantity
@@ -41,7 +41,7 @@ func (c *Cart) AddItem(item *CartItem) error {
 		return fmt.Errorf("product '%s' is already added to the cart", item.ID.Hex())
 	}
 	c.Items = append(c.Items, item)
-	c.refresh()
+	c.Refresh()
 	return nil
 }
 
@@ -52,7 +52,7 @@ func (c *Cart) RemoveItem(id primitive.ObjectID) bool {
 		if item.ID.Hex() == id.Hex() {
 			c.Items[index] = c.Items[length-1]
 			c.Items = c.Items[:length-1]
-			c.refresh()
+			c.Refresh()
 			return true
 		}
 	}

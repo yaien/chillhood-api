@@ -54,7 +54,7 @@ func TestCartRefresh(t *testing.T) {
 		},
 	}
 	for _, testcase := range testcases {
-		testcase.cart.refresh()
+		testcase.cart.Refresh()
 		if testcase.total != testcase.cart.Total {
 			t.Errorf("expected total to be %d, received: %d", testcase.total, testcase.cart.Total)
 		}

@@ -9,6 +9,7 @@ import (
 func invoice(router *mux.Router, mod *module) {
 	invoice := &controllers.InvoiceController{
 		Invoices: mod.service.invoices,
+		Carts:    mod.service.carts,
 	}
 	guest := &controllers.GuestController{
 		Guests: mod.service.guests,
