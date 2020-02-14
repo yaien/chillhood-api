@@ -13,7 +13,7 @@ import (
 	"github.com/yaien/clothes-store-api/api/services"
 )
 
-type payload struct {
+type ItemPayload struct {
 	ID       string `json:"id"`
 	Size     string `json:"size"`
 	Quantity int    `json:"quantity"`
@@ -25,7 +25,7 @@ type CartController struct {
 }
 
 func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
-	var data payload
+	var data ItemPayload
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)

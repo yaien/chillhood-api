@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/yaien/clothes-store-api/api/helpers/input"
 	"github.com/yaien/clothes-store-api/api/helpers/response"
 	"github.com/yaien/clothes-store-api/api/models"
 	"github.com/yaien/clothes-store-api/api/services"
@@ -14,21 +15,24 @@ import (
 
 type InvoiceController struct {
 	Invoices services.InvoiceService
+	Carts    services.CartService
 }
 
 func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
-	var shipping models.Shipping
-	if err := json.NewDecoder(r.Body).Decode(&shipping); err != nil {
+	var payload input.Invoice
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		response.Error(w, err, http.StatusBadGateway)
 		return
 	}
-	guest := r.Context().Value(key("guest")).(*models.Guest)
-	if guest.Cart == nil || len(guest.Cart.Items) == 0 {
-		response.Error(w, errors.New("INVALID_CART"), http.StatusBadRequest)
+
+	cart, err := i.Carts.New(payload.Items)
+
+	if err != nil {
+		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
-	invoice := &models.Invoice{Cart: guest.Cart, Shipping: &shipping}
+	invoice := &models.Invoice{Cart: cart, Shipping: payload.Shipping}
 	if err := i.Invoices.Create(invoice); err != nil {
 		log.Println(err)
 		response.Error(w, errors.New("SERVER_FAILED"), http.StatusInternalServerError)
