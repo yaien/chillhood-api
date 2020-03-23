@@ -32,7 +32,9 @@ func createUser() *cobra.Command {
 				Name:     name,
 			}
 			user.HashPassword()
-			service.Create(&user)
+			if err := service.Create(&user); err != nil {
+				log.Fatal(err)
+			}
 			bytes, _ := json.MarshalIndent(&user, "", "    ")
 			fmt.Println(string(bytes))
 		},
