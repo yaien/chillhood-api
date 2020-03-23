@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/yaien/clothes-store-api/api/models"
-	"github.com/yaien/clothes-store-api/api/services"
-	"github.com/yaien/clothes-store-api/core"
 	"log"
+
+	"github.com/spf13/cobra"
+	"github.com/yaien/clothes-store-api/pkg/api/models"
+	"github.com/yaien/clothes-store-api/pkg/api/services"
+	"github.com/yaien/clothes-store-api/pkg/core"
 )
 
 func createUser() *cobra.Command {
@@ -16,19 +17,19 @@ func createUser() *cobra.Command {
 	var password string
 
 	cmd := &cobra.Command{
-		Use: "users:create",
+		Use:   "users:create",
 		Short: "Create an user that can admin the cloth store api",
-		Run: func(cmd *cobra.Command, args []string){
+		Run: func(cmd *cobra.Command, args []string) {
 			app, err := core.NewApp()
 			if err != nil {
 				log.Fatal(err)
 			}
 			service := services.NewUserService(app.DB)
 			user := models.User{
-				Role: "admin",
+				Role:     "admin",
 				Password: password,
-				Email: email,
-				Name: name,
+				Email:    email,
+				Name:     name,
 			}
 			user.HashPassword()
 			service.Create(&user)
