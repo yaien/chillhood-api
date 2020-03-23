@@ -6,8 +6,8 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"github.com/yaien/clothes-store-api/api/routes"
-	"github.com/yaien/clothes-store-api/core"
+	"github.com/yaien/clothes-store-api/pkg/api/routes"
+	"github.com/yaien/clothes-store-api/pkg/core"
 )
 
 func server() *cobra.Command {
