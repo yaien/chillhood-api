@@ -12,28 +12,27 @@ jobs:
       - restore_cache:
           keys:
             - v1-pkg-cache
-      - run: 
+      - run:
           name: unit tests
           command: go test -v ./...
       - save_cache:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
-  deploy-dev:
+  deploy_dev:
     build:
       docker:
         - image: docker
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: 
-          name: building docker image
-          command: docker build -t yaien/cloth-store-api:dev .      
+      - setup_remote_docker
+      - run:
+          name: docker image
+          command: docker build -t yaien/cloth-store-api:dev .
 
 workflows:
   version: 2
   dev:
     jobs:
       - build
-      - deploy-dev
+      - deploy_dev
