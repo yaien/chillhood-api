@@ -25,8 +25,8 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run: 
-        name: building docker image
-        command: docker build -t yaien/cloth-store-api:dev .      
+          name: building docker image
+          command: docker build -t yaien/cloth-store-api:dev .      
 
 workflows:
   version: 2
