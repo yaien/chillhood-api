@@ -33,5 +33,4 @@ workflows:
   dev:
     jobs:
       - build
-      - deploy-dev:
-        requires: build
+      - deploy-dev
