@@ -19,13 +19,14 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: build docker image
           command: docker build -t yaien/cloth-store-api:dev .
       - run:
           name: push docker image
           command: |
-              docker login --username-_ --password=${HEROKU_TOKEN} registry.heroku.com
+              docker login --username=_ --password=${HEROKU_TOKEN} registry.heroku.com
               docker tag yaien/cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
               docker push registry.heroku.com/${HEROKU_APP}/web 
