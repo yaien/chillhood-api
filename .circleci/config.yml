@@ -30,7 +30,7 @@ jobs:
       - run:
           name: tag docker image
           command: docker tag cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
-      - docker-build-release:
+      - heroku/docker-build-release:
           app_name: ${HEROKU_APP}
           app_type: web 
           
