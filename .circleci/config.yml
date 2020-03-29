@@ -3,7 +3,7 @@
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
 orbs:
-  deploy-to-heroku: betterdoc/deploy-to-heroku@4.1.0
+  heroku: betterdoc/deploy-to-heroku@4.1.0
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       - run:
           name: tag docker image
           command: docker tag cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
-      - deploy-to-heroku/docker_build_release:
+      - heroku/docker_build_release:
           app_name: ${HEROKU_APP}
           app_type: web 
           
