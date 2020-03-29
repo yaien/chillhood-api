@@ -2,6 +2,9 @@
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
+orbs:
+  deploy-to-heroku: betterdoc/deploy-to-heroku@4.1.0
+
 jobs:
   build:
     docker:
@@ -25,8 +28,9 @@ jobs:
           name: build docker image
           command: docker build -t cloth-store-api:dev .
       - run:
-          name: push docker image
-          command: |
-              echo ${HEROKU_TOKEN} | docker login --username=_ --password-stdin registry.heroku.com
-              docker tag cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
-              docker push registry.heroku.com/${HEROKU_APP}/web 
+          name: tag docker image
+          command: docker tag cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
+      - deploy-to-heroku/docker_build_release
+          app_name: ${HEROKU_APP}
+          app_type: web 
+          
