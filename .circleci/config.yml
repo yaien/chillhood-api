@@ -17,3 +17,17 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
+  deploy-dev:
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: |
+        docker build -t yaien/cloth-store-api:dev .      
+
+workflows:
+  version: 2
+  jobs:
+    - build
+    - deploy-dev:
+      requires: build
