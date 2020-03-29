@@ -22,8 +22,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: |
-        docker build -t yaien/cloth-store-api:dev .      
+      - run: docker build -t yaien/cloth-store-api:dev .      
 
 workflows:
   version: 2
