@@ -22,4 +22,4 @@ jobs:
       - setup_remote_docker
       - run:
         name: build docker image
-        command: docker build -t yaien/cloth-store-api:dev
+        command: docker build -t yaien/cloth-store-api:dev .
