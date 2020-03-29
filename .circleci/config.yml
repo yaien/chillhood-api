@@ -13,7 +13,7 @@ jobs:
           keys:
             - v1-pkg-cache
       - run:
-          name: unit tests
+          name: Run Unit tests
           command: go test -v ./...
       - save_cache:
           key: v1-pkg-cache
@@ -28,5 +28,5 @@ jobs:
           name: push docker image
           command: |
               echo ${HEROKU_TOKEN} | docker login --username=_ --password-stdin registry.heroku.com
-              docker cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
+              docker tag cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
               docker push registry.heroku.com/${HEROKU_APP}/web 
