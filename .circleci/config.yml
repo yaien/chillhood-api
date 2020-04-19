@@ -25,15 +25,12 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: build docker image
-          command: docker build -t cloth-store-api:dev .
-      - run:
-          name: tag docker image
-          command: docker tag cloth-store-api:dev registry.heroku.com/${HEROKU_APP}/web
-      - run:
-          name: install heroku cli
-          command: curl https://cli-assets.heroku.com/install.sh | sh
-      - run:
           name: deploy to heroku
-          command: heroku container:release web --app ${HEROKU_APP}
+          command: >
+            curl https://cli-assets.heroku.com/install.sh | sh
+            heroku login
+            heroku container:push web --app ${HEROKU_APP}
+            heroku container:release web --app ${HEROKU_APP}
+
+
           
