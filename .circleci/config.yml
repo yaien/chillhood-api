@@ -29,7 +29,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: install heroku
-          command: curl https://cli-assets.heroku.com/install.sh | sh &&
+          command: curl https://cli-assets.heroku.com/install.sh | sh
       - run: 
           name: login heroku
           command: heroku container:login
