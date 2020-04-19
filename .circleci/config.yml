@@ -2,11 +2,9 @@
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
-orbs:
-  heroku: betterdoc/deploy-to-heroku@4.1.0
 
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/golang:1.12
     steps:
@@ -42,5 +40,11 @@ jobs:
           name: release container 
           command: heroku container:release web --app ${HEROKU_APP}
 
+workflows:
+  version: 2
+  workflow: 
+    jobs:
+      - test
+      - deploy
 
           
