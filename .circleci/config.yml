@@ -13,7 +13,7 @@ jobs:
           keys:
             - v1-pkg-cache
       - run: 
-          name: install dependencies
+          name: Install dependencies
           command: go mod download 
       - run:
           name: Run Unit tests
@@ -23,21 +23,21 @@ jobs:
           paths:
             - "/go/pkg"
       
-  deploy:
+  deploy_dev:
     machine: true
     steps:
       - checkout
       - run:
-          name: install heroku
+          name: Install Heroku CLI
           command: curl https://cli-assets.heroku.com/install.sh | sh
       - run: 
-          name: login heroku
+          name: Heroku login
           command: heroku container:login
       - run:
-          name: push container
+          name: Push container
           command: heroku container:push web --app ${HEROKU_APP}
       - run:
-          name: release container 
+          name: Release container 
           command: heroku container:release web --app ${HEROKU_APP}
 
 workflows:
@@ -45,6 +45,12 @@ workflows:
   workflow: 
     jobs:
       - test
-      - deploy
+      - deploy_dev:
+        requires: test
+        filters:
+          branches:
+            only:
+              - develop
+        
 
           
