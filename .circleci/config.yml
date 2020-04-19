@@ -9,7 +9,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.12
-
     steps:
       - checkout
       - restore_cache:
@@ -25,8 +24,11 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
-      - setup_remote_docker:
-          docker_layer_caching: true
+      
+  deploy:
+    machine: true
+    steps:
+      - checkout
       - run:
           name: install heroku
           command: curl https://cli-assets.heroku.com/install.sh | sh
