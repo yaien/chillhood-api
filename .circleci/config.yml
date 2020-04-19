@@ -27,9 +27,6 @@ jobs:
       - run:
           name: install heroku
           command: curl https://cli-assets.heroku.com/install.sh | sh
-      - run: 
-          name: login heroku
-          command: heroku login
       - run:
           name: push container
           command: heroku container:push web --app ${HEROKU_APP}
