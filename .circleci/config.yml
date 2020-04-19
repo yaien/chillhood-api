@@ -23,7 +23,7 @@ jobs:
           paths:
             - "/go/pkg"
       
-  deploy_dev:
+  deploy:
     machine: true
     steps:
       - checkout
@@ -45,13 +45,8 @@ workflows:
   workflow: 
     jobs:
       - test
-      - deploy_dev:
+      - deploy:
         requires: 
           - test
-        filters:
-          branches:
-            only:
-              - develop
-        
 
           
