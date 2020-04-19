@@ -25,12 +25,17 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: deploy to heroku
-          command: >
-            curl https://cli-assets.heroku.com/install.sh | sh
-            heroku login
-            heroku container:push web --app ${HEROKU_APP}
-            heroku container:release web --app ${HEROKU_APP}
+          name: install heroku
+          command: curl https://cli-assets.heroku.com/install.sh | sh
+      - run: 
+          name: login heroku
+          command: heroku login
+      - run:
+          name: push container
+          command: heroku container:push web --app ${HEROKU_APP}
+      - run:
+          name: release container
+          command: heroku container:release web --app ${HEROKU_APP}
 
 
           
