@@ -18,7 +18,7 @@ type Item struct {
 	Price       int                `json:"price"`
 	Active      bool               `json:"active"`
 	Tags        []string           `json:"tags"`
-	Pictures    []string           `json:"pictures"`
+	Pictures    []*Picture         `json:"pictures"`
 	Description string             `json:"description"`
 	CreatedAt   int64              `json:"createdAt"`
 	Sizes       []*Size            `json:"sizes"`
