@@ -28,6 +28,11 @@ type ClientConfig struct {
 	Origins []string
 }
 
+type ClodinaryConfig struct {
+	CloudName    string
+	UploadPreset string
+}
+
 // Config -> environment variable settings
 type Config struct {
 	Production bool
@@ -37,6 +42,7 @@ type Config struct {
 	Epayco     *EpaycoConfig
 	JWT        *JWTConfig
 	Client     *ClientConfig
+	Cloudinary *ClodinaryConfig
 }
 
 func address() string {
@@ -84,6 +90,10 @@ func load() *Config {
 		Client: &ClientConfig{
 			Keys:    strings.Split(os.Getenv("CLIENT_KEYS"), ","),
 			Origins: strings.Split(os.Getenv("CLIENT_ORIGIN"), ","),
+		},
+		Cloudinary: &ClodinaryConfig{
+			CloudName:    os.Getenv("CLOUDINARY_CLOUD_NAME"),
+			UploadPreset: os.Getenv("CLOUDINARY_UPLOAD_PRESET"),
 		},
 	}
 }

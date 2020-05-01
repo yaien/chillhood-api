@@ -16,5 +16,6 @@ func Register(app *core.App) *mux.Router {
 	item(router, mod)
 	invoice(router, mod)
 	epayco(router, mod)
+	config(router, mod)
 	return router
 }

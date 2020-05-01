@@ -15,6 +15,7 @@ type service struct {
 	epayco   services.EpaycoService
 	invoices services.InvoiceService
 	tokens   services.TokenService
+	config   services.ConfigService
 }
 
 type middleware struct {
@@ -34,6 +35,7 @@ func bundle(app *core.App) *module {
 	epayco := services.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL)
 	invoices := services.NewInvoiceService(app.DB)
 	tokens := services.NewTokenService(app.Config.Client, app.Config.JWT, users)
+	config := services.NewConfigService(app.Config)
 
 	return &module{
 		service: &service{
@@ -44,6 +46,7 @@ func bundle(app *core.App) *module {
 			epayco:   epayco,
 			invoices: invoices,
 			tokens:   tokens,
+			config:   config,
 		},
 		middleware: &middleware{
 			jwt: &middlewares.JWTGuard{Tokens: tokens, Users: users},
