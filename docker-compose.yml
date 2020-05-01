@@ -6,7 +6,7 @@ services:
     environment:
       PORT: 8080
       MONGODB_URI: "mongodb://mongo:27017/store"
-    container_name: clothes-store-api
+    container_name: cloth-store-api
     ports:
       - "8080:8080"
     depends_on:
