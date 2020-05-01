@@ -82,7 +82,7 @@ func load() *Config {
 			Duration: expiration(os.Getenv("JWT_DURATION")),
 		},
 		Client: &ClientConfig{
-			Keys:    strings.Split(os.Getenv("CLIENT_KEY"), ","),
+			Keys:    strings.Split(os.Getenv("CLIENT_KEYS"), ","),
 			Origins: strings.Split(os.Getenv("CLIENT_ORIGIN"), ","),
 		},
 	}
