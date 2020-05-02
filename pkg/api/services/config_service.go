@@ -17,5 +17,5 @@ func (cs *configService) Cloudinary() *core.ClodinaryConfig {
 
 // NewConfigService returns a new config service
 func NewConfigService(config *core.Config) ConfigService {
-	return &configService{}
+	return &configService{config}
 }
