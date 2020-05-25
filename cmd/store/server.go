@@ -22,6 +22,7 @@ func server() *cobra.Command {
 			server := negroni.Classic()
 			server.Use(cors.New(cors.Options{
 				AllowedOrigins: app.Config.Client.Origins,
+				AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"},
 			}))
 			router := routes.Register(app)
 			server.UseHandler(router)
