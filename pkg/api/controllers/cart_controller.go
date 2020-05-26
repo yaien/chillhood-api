@@ -59,11 +59,16 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value(key("guest")).(*models.Guest)
 
 	item := &models.CartItem{
-		ID:       product.ID,
-		Name:     product.Name,
-		Price:    product.Price,
-		Quantity: data.Quantity,
-		Size:     size.Label,
+		ID:          product.ID,
+		Name:        product.Name,
+		Price:       product.Price,
+		Description: product.Description,
+		Quantity:    data.Quantity,
+		Size:        size.Label,
+	}
+
+	if len(product.Pictures) > 0 {
+		item.Picture = product.Pictures[0]
 	}
 
 	if guest.Cart == nil {
