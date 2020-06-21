@@ -20,5 +20,5 @@ func invoice(router *mux.Router, mod *module) {
 		negroni.WrapFunc(invoice.Create),
 	)).Methods("POST")
 
-	router.HandleFunc("/api/v1/invoices/{invoice_ref}", invoice.Show).Methods("GET")
+	router.HandleFunc("/api/v1/public/invoices/{invoice_ref}", invoice.Show).Methods("GET")
 }

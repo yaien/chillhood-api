@@ -18,3 +18,7 @@ func (cc *ConfigController) Cloudinary(w http.ResponseWriter, r *http.Request) {
 		"preset": config.UploadPreset,
 	}, http.StatusOK)
 }
+
+func (cc *ConfigController) Epayco(w http.ResponseWriter, r *http.Request) {
+	response.JSON(w, cc.Config.Epayco(), http.StatusOK)
+}

@@ -16,7 +16,6 @@ import (
 type EpaycoService interface {
 	Request(ref string) (*epayco.Response, error)
 	Verify(payment *epayco.Payment) bool
-	CheckoutArgs() *epayco.CheckoutArgs
 }
 
 type epaycoService struct {
@@ -49,15 +48,6 @@ func (e *epaycoService) Verify(payment *epayco.Payment) bool {
 	source := strings.Join(payload, "^")
 	signature := fmt.Sprintf("%x", sha256.Sum256([]byte(source)))
 	return signature == payment.Signature
-}
-
-func (e *epaycoService) CheckoutArgs() *epayco.CheckoutArgs {
-	return &epayco.CheckoutArgs{
-		Key:          e.config.PublicKey,
-		Test:         e.config.Test,
-		Response:     e.baseURL.String() + "/api/v1/epayco/response",
-		Confirmation: e.baseURL.String() + "/api/v1/epayco/confirmation",
-	}
 }
 
 func NewEpaycoService(config *core.EpaycoConfig, baseURL *url.URL) EpaycoService {

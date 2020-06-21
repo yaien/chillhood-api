@@ -6,6 +6,8 @@ import (
 )
 
 func config(r *mux.Router, mod *module) {
-	controller := &controllers.ConfigController{Config: mod.service.config}
-	r.HandleFunc("/api/v1/public/config/cloudinary", controller.Cloudinary).Methods("GET")
+	config := &controllers.ConfigController{Config: mod.service.config}
+	r.HandleFunc("/api/v1/public/config/cloudinary", config.Cloudinary).Methods("GET")
+	r.HandleFunc("/api/v1/public/config/epayco", config.Epayco).Methods("GET")
+
 }

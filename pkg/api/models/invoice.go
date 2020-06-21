@@ -14,7 +14,7 @@ type Invoice struct {
 	Shipping  *Shipping          `json:"shipping"`
 	Status    InvoiceStatus      `json:"status"`
 	CreatedAt int64              `json:"createdAt"`
-	Payment   *epayco.Payment    `json:"payment"`
+	Payment   *epayco.Payment    `json:"-"`
 }
 
 const (
