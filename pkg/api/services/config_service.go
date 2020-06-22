@@ -23,8 +23,8 @@ func (cs *configService) Epayco() *epayco.CheckoutArgs {
 	return &epayco.CheckoutArgs{
 		Key:          cs.config.Epayco.PublicKey,
 		Test:         cs.config.Epayco.Test,
-		Response:     cs.config.BaseURL.String() + "/api/v1/epayco/response",
-		Confirmation: cs.config.BaseURL.String() + "/api/v1/epayco/confirmation",
+		Response:     cs.config.BaseURL.String() + "/api/v1/public/epayco/response",
+		Confirmation: cs.config.BaseURL.String() + "/api/v1/public/epayco/confirmation",
 	}
 }
 
