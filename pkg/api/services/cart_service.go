@@ -60,12 +60,19 @@ func (c *cartService) New(requests []*input.Item) (*models.Cart, error) {
 			return nil, fmt.Errorf("there is only %d %s (id: %s, size: %s) items, requested %d",
 				size.Existence, item.Name, id, size.Label, request.Quantity)
 		}
+
+		var picture *models.Picture
+		if len(item.Pictures) > 0 {
+			picture = item.Pictures[0]
+		}
+
 		cart.Items = append(cart.Items, &models.CartItem{
 			ID:       item.ID,
 			Name:     item.Name,
 			Price:    item.Price,
 			Quantity: request.Quantity,
 			Size:     request.Size,
+			Picture:  picture,
 		})
 	}
 	cart.Refresh()
