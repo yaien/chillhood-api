@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,17 +11,21 @@ import (
 	"strings"
 
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/epayco"
+	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/core"
 )
 
 type EpaycoService interface {
 	Request(ref string) (*epayco.Response, error)
 	Verify(payment *epayco.Payment) bool
+	Process(res *epayco.Response) (*models.Invoice, error)
 }
 
 type epaycoService struct {
-	config  *core.EpaycoConfig
-	baseURL *url.URL
+	invoices InvoiceService
+	carts    CartService
+	config   *core.EpaycoConfig
+	baseURL  *url.URL
 }
 
 func (e *epaycoService) Request(ref string) (*epayco.Response, error) {
@@ -50,6 +55,56 @@ func (e *epaycoService) Verify(payment *epayco.Payment) bool {
 	return signature == payment.Signature
 }
 
-func NewEpaycoService(config *core.EpaycoConfig, baseURL *url.URL) EpaycoService {
-	return &epaycoService{config, baseURL}
+func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
+	if !res.Success {
+		return nil, errors.New("UNSUCCESSFULL_RESPONSE")
+	}
+
+	if !e.Verify(res.Data) {
+		return nil, errors.New("INVALID_SIGNATURE")
+	}
+
+	invoice, err := e.invoices.GetByRef(res.Data.Invoice)
+
+	if err != nil {
+		return nil, fmt.Errorf("INVOICE_NOT_FOUND: %s", err.Error())
+	}
+
+	if invoice.Status != models.Accepted {
+		switch res.Data.ResponseCode {
+		case epayco.Accepted:
+			invoice.Status = models.Accepted
+			if !invoice.Cart.Executed {
+				if err := e.carts.Execute(invoice.Cart); err != nil {
+					return nil, err
+				}
+			}
+			// create order
+			break
+		case epayco.Pending:
+			invoice.Status = models.Pending
+			if !invoice.Cart.Executed {
+				if err := e.carts.Execute(invoice.Cart); err != nil {
+					return nil, err
+				}
+			}
+			break
+		default:
+			invoice.Status = models.Rejected
+			if err := e.carts.Revert(invoice.Cart); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	invoice.Payment = res.Data
+	if err := e.invoices.Update(invoice); err != nil {
+		return nil, err
+	}
+
+	return invoice, nil
+}
+
+func NewEpaycoService(config *core.EpaycoConfig, baseURL *url.URL, invoiceSrv InvoiceService, cartSrv CartService) EpaycoService {
+	return &epaycoService{invoiceSrv, cartSrv, config, baseURL}
 }

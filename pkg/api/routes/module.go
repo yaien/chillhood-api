@@ -32,8 +32,8 @@ func bundle(app *core.App) *module {
 	users := services.NewUserService(app.DB)
 	carts := services.NewCartService(items)
 	guests := services.NewGuestService(app.DB)
-	epayco := services.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL)
 	invoices := services.NewInvoiceService(app.DB)
+	epayco := services.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL, invoices, carts)
 	tokens := services.NewTokenService(app.Config.Client, app.Config.JWT, users)
 	config := services.NewConfigService(app.Config)
 

@@ -7,9 +7,7 @@ import (
 
 func epayco(router *mux.Router, mod *module) {
 	c := &controllers.EpaycoController{
-		Epayco:  mod.service.epayco,
-		Invoice: mod.service.invoices,
-		Cart:    mod.service.carts,
+		Epayco: mod.service.epayco,
 	}
 	router.HandleFunc("/api/v1/public/epayco/response", c.Response).Methods("GET", "POST")
 	router.HandleFunc("/api/v1/public/epayco/confirmation", c.Confirmation).Methods("POST")
