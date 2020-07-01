@@ -56,7 +56,7 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	guest := r.Context().Value(key("guest")).(*models.Guest)
+	guest := r.Context().Value("guest").(*models.Guest)
 
 	item := &models.CartItem{
 		ID:          product.ID,
@@ -86,7 +86,7 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *CartController) Remove(w http.ResponseWriter, r *http.Request) {
-	guest := r.Context().Value(key("guest")).(*models.Guest)
+	guest := r.Context().Value("guest").(*models.Guest)
 	itemID, err := primitive.ObjectIDFromHex(mux.Vars(r)["item_id"])
 	if err != nil {
 		response.Error(w, errors.New("INVALID_ITEM_ID"), http.StatusNotFound)
