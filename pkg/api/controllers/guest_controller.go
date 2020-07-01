@@ -33,12 +33,12 @@ func (c *GuestController) Param(w http.ResponseWriter, r *http.Request, next htt
 		response.Error(w, errors.New("GUEST_NOT_FOUND"), http.StatusNotFound)
 		return
 	}
-	ctx := context.WithValue(r.Context(), key("guest"), guest)
+	ctx := context.WithValue(r.Context(), "guest", guest)
 	log.Println(guest)
 	next(w, r.WithContext(ctx))
 }
 
 func (c *GuestController) Show(w http.ResponseWriter, r *http.Request) {
-	guest := r.Context().Value(key("guest")).(*models.Guest)
+	guest := r.Context().Value("guest").(*models.Guest)
 	response.Send(w, guest)
 }
