@@ -28,6 +28,8 @@ func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	guest := r.Context().Value("guest").(*models.Guest)
+
 	cart, err := i.Carts.New(payload.Items)
 
 	if err != nil {
@@ -35,7 +37,7 @@ func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoice := &models.Invoice{Cart: cart, Shipping: payload.Shipping}
+	invoice := &models.Invoice{Cart: cart, Shipping: payload.Shipping, GuestID: guest.ID}
 	if err := i.Invoices.Create(invoice); err != nil {
 		log.Println(err)
 		response.Error(w, errors.New("SERVER_FAILED"), http.StatusInternalServerError)

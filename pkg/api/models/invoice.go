@@ -13,6 +13,7 @@ type Invoice struct {
 	Status    InvoiceStatus      `json:"status"`
 	CreatedAt int64              `json:"createdAt"`
 	Payment   *epayco.Payment    `json:"-"`
+	GuestID   primitive.ObjectID `json:"-"`
 }
 
 type InvoiceStatus string

@@ -14,6 +14,7 @@ type GuestService interface {
 	Create(guest *models.Guest) error
 	Get(id string) (*models.Guest, error)
 	Update(guest *models.Guest) error
+	Reset(id string) error
 }
 
 type guestService struct {
@@ -41,6 +42,17 @@ func (s *guestService) Get(id string) (*models.Guest, error) {
 		return nil, err
 	}
 	return &guest, nil
+}
+
+func (s *guestService) Reset(id string) error {
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	filter := bson.M{"_id": _id}
+	update := bson.M{"cart": nil}
+	_, err = s.collection.UpdateOne(context.TODO(), filter, update)
+	return err
 }
 
 func (s *guestService) Update(guest *models.Guest) error {

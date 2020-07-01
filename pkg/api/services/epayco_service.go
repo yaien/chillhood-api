@@ -24,6 +24,7 @@ type EpaycoService interface {
 type epaycoService struct {
 	invoices InvoiceService
 	carts    CartService
+	guests   GuestService
 	config   *core.EpaycoConfig
 	baseURL  *url.URL
 }
@@ -80,7 +81,9 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 					return nil, err
 				}
 			}
-			// create order
+			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
+				return nil, err
+			}
 			break
 		case epayco.Pending:
 			invoice.Status = models.Pending
@@ -88,6 +91,9 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 				if err := e.carts.Execute(invoice.Cart); err != nil {
 					return nil, err
 				}
+			}
+			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
+				return nil, err
 			}
 			break
 		default:
@@ -106,6 +112,11 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 	return invoice, nil
 }
 
-func NewEpaycoService(config *core.EpaycoConfig, baseURL *url.URL, invoiceSrv InvoiceService, cartSrv CartService) EpaycoService {
-	return &epaycoService{invoiceSrv, cartSrv, config, baseURL}
+func NewEpaycoService(
+	config *core.EpaycoConfig,
+	baseURL *url.URL,
+	invoiceSrv InvoiceService,
+	cartSrv CartService,
+	guestSrv GuestService) EpaycoService {
+	return &epaycoService{invoiceSrv, cartSrv, guestSrv, config, baseURL}
 }
