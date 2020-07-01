@@ -50,7 +50,7 @@ func (s *guestService) Reset(id string) error {
 		return err
 	}
 	filter := bson.M{"_id": _id}
-	update := bson.M{"$set": bson.M{"cart": &primitive.Null{}}}
+	update := bson.M{"$unset": bson.M{"cart": ""}}
 	_, err = s.collection.UpdateOne(context.TODO(), filter, update)
 	return err
 }
