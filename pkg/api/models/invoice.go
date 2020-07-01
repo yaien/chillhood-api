@@ -5,8 +5,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type InvoiceStatus string
-
 type Invoice struct {
 	ID        primitive.ObjectID `bson:"_id" json:"id"`
 	Ref       string             `json:"ref"`
@@ -16,6 +14,8 @@ type Invoice struct {
 	CreatedAt int64              `json:"createdAt"`
 	Payment   *epayco.Payment    `json:"-"`
 }
+
+type InvoiceStatus string
 
 const (
 	Created  InvoiceStatus = "created"

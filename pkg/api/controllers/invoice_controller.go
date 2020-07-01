@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/api/services"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type InvoiceController struct {
@@ -21,7 +24,7 @@ type InvoiceController struct {
 func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 	var payload input.Invoice
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		response.Error(w, err, http.StatusBadGateway)
+		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -43,10 +46,68 @@ func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (i *InvoiceController) Show(w http.ResponseWriter, r *http.Request) {
+	invoice := r.Context().Value("invoice").(*models.Invoice)
+	response.Send(w, invoice)
+}
+
+func (i *InvoiceController) Find(w http.ResponseWriter, r *http.Request) {
+	status := r.URL.Query().Get("status")
+	filter := bson.M{}
+
+	if status != "" {
+		filter["status"] = status
+	}
+
+	invoices, err := i.Invoices.Find(filter)
+	if err != nil {
+		response.Error(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	response.Send(w, invoices)
+}
+
+func (i *InvoiceController) GetByRef(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	ref := mux.Vars(r)["invoice_ref"]
 	invoice, err := i.Invoices.GetByRef(ref)
 	if err != nil {
-		response.Error(w, errors.New("INVOICE_NOT_FOUND"), http.StatusNotFound)
+		response.Error(w, fmt.Errorf("INVOICE_NOT_FOUND: %s", err), http.StatusNotFound)
+		return
+	}
+	ctx := context.WithValue(r.Context(), "invoice", invoice)
+	next(w, r.WithContext(ctx))
+}
+
+func (i *InvoiceController) Get(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	id := mux.Vars(r)["invoice_id"]
+	invoice, err := i.Invoices.Get(id)
+	if err != nil {
+		response.Error(w, fmt.Errorf("INVOICE_NOT_FOUND: %s", err), http.StatusNotFound)
+		return
+	}
+	ctx := context.WithValue(r.Context(), "invoice", invoice)
+	next(w, r.WithContext(ctx))
+}
+
+func (i *InvoiceController) SetTransport(w http.ResponseWriter, r *http.Request) {
+	invoice := r.Context().Value("invoice").(*models.Invoice)
+	if invoice.Status != models.Accepted {
+		response.Error(w, errors.New("INVOICE_INVALID"), http.StatusBadRequest)
+		return
+	}
+
+	var transport models.Transport
+	err := json.NewDecoder(r.Body).Decode(&transport)
+	if err != nil {
+		response.Error(w, err, http.StatusBadRequest)
+		return
+	}
+
+	invoice.Shipping.Status = models.Sended
+	invoice.Shipping.Transport = &transport
+	err = i.Invoices.Update(invoice)
+	if err != nil {
+		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 	response.Send(w, invoice)

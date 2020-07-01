@@ -74,6 +74,7 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 		switch res.Data.ResponseCode {
 		case epayco.Accepted:
 			invoice.Status = models.Accepted
+			invoice.Shipping.Status = models.Preparing
 			if !invoice.Cart.Executed {
 				if err := e.carts.Execute(invoice.Cart); err != nil {
 					return nil, err

@@ -16,6 +16,8 @@ import (
 type InvoiceService interface {
 	Create(invoice *models.Invoice) error
 	Update(invoice *models.Invoice) error
+	Get(id string) (*models.Invoice, error)
+	Find(filter map[string]interface{}) ([]*models.Invoice, error)
 	GetByRef(ref string) (*models.Invoice, error)
 }
 
@@ -32,11 +34,39 @@ func (s *invoiceService) Create(invoice *models.Invoice) error {
 	return err
 }
 
+func (s *invoiceService) Get(id string) (*models.Invoice, error) {
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	var invoice models.Invoice
+	filter := bson.M{"_id": _id}
+	err = s.invoices.FindOne(context.TODO(), filter).Decode(&invoice)
+	return &invoice, err
+}
+
 func (s *invoiceService) GetByRef(ref string) (*models.Invoice, error) {
 	var invoice models.Invoice
 	filter := bson.M{"ref": ref}
 	err := s.invoices.FindOne(context.TODO(), filter).Decode(&invoice)
 	return &invoice, err
+}
+
+func (s *invoiceService) Find(filter map[string]interface{}) ([]*models.Invoice, error) {
+	var invoices []*models.Invoice
+	cursor, err := s.invoices.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(context.TODO()) {
+		var invoice models.Invoice
+		err := cursor.Decode(&invoice)
+		if err != nil {
+			return nil, err
+		}
+		invoices = append(invoices, &invoice)
+	}
+	return invoices, nil
 }
 
 func (s *invoiceService) Update(invoice *models.Invoice) error {
