@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,6 +27,8 @@ func (s *userService) FindOne(filter bson.M) (*models.User, error) {
 
 func (s *userService) Create(user *models.User) error {
 	user.ID = primitive.NewObjectID()
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 	_, err := s.collection.InsertOne(context.TODO(), user)
 	return err
 }

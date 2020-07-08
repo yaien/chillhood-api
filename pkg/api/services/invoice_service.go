@@ -28,7 +28,8 @@ type invoiceService struct {
 func (s *invoiceService) Create(invoice *models.Invoice) error {
 	invoice.ID = primitive.NewObjectID()
 	invoice.Ref = strings.ToUpper(shortid.MustGenerate())
-	invoice.CreatedAt = time.Now().Unix()
+	invoice.CreatedAt = time.Now()
+	invoice.UpdatedAt = time.Now()
 	invoice.Status = models.Created
 	_, err := s.invoices.InsertOne(context.TODO(), invoice)
 	return err
@@ -70,6 +71,7 @@ func (s *invoiceService) Find(filter map[string]interface{}) ([]*models.Invoice,
 }
 
 func (s *invoiceService) Update(invoice *models.Invoice) error {
+	invoice.UpdatedAt = time.Now()
 	filter := bson.M{"_id": invoice.ID}
 	update := bson.M{"$set": invoice}
 	_, err := s.invoices.UpdateOne(context.TODO(), filter, update)

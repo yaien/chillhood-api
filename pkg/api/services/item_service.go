@@ -28,7 +28,7 @@ type itemService struct {
 
 func (p *itemService) Create(item *models.Item) error {
 	item.ID = primitive.NewObjectID()
-	item.CreatedAt = time.Now().Unix()
+	item.CreatedAt = time.Now()
 	item.Slug = slug.Make(item.Name)
 	_, err := p.collection.InsertOne(context.TODO(), item)
 	return err
@@ -66,10 +66,11 @@ func (p *itemService) Find(filter interface{}) ([]*models.Item, error) {
 	return items, nil
 }
 
-func (p *itemService) Update(product *models.Item) error {
-	product.Slug = slug.Make(product.Name)
-	filter := bson.M{"_id": product.ID}
-	update := bson.M{"$set": product}
+func (p *itemService) Update(item *models.Item) error {
+	item.Slug = slug.Make(item.Name)
+	item.UpdatedAt = time.Now()
+	filter := bson.M{"_id": item.ID}
+	update := bson.M{"$set": item}
 	_, err := p.collection.UpdateOne(context.TODO(), filter, update)
 	return err
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -20,7 +21,8 @@ type Item struct {
 	Tags        []string           `json:"tags"`
 	Pictures    []*Picture         `json:"pictures"`
 	Description string             `json:"description"`
-	CreatedAt   int64              `json:"createdAt"`
+	CreatedAt   time.Time          `json:"createdAt"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
 	Sizes       []*Size            `json:"sizes"`
 }
 
