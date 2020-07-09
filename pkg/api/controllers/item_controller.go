@@ -25,6 +25,7 @@ func (p *ItemController) Create(w http.ResponseWriter, r *http.Request) {
 		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
+
 	err = p.Items.Create(&item)
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)

@@ -31,5 +31,6 @@ func connect(rawurl string) (*mongo.Database, error) {
 
 	path := strings.Replace(uri.Path, "/", "", 1)
 	db := client.Database(path)
+
 	return db, nil
 }

@@ -14,6 +14,7 @@ func main() {
 	}
 	root.AddCommand(
 		createUser(),
+		createIndexes(),
 		server(),
 	)
 	err := root.Execute()

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/gosimple/slug"
@@ -30,7 +31,16 @@ func (p *itemService) Create(item *models.Item) error {
 	item.ID = primitive.NewObjectID()
 	item.CreatedAt = time.Now()
 	item.Slug = slug.Make(item.Name)
-	_, err := p.collection.InsertOne(context.TODO(), item)
+
+	count, err := p.collection.CountDocuments(context.TODO(), bson.M{"name": item.Name})
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("ItemExists: there is already a item with name %s", item.Name)
+	}
+
+	_, err = p.collection.InsertOne(context.TODO(), item)
 	return err
 }
 
@@ -69,9 +79,21 @@ func (p *itemService) Find(filter interface{}) ([]*models.Item, error) {
 func (p *itemService) Update(item *models.Item) error {
 	item.Slug = slug.Make(item.Name)
 	item.UpdatedAt = time.Now()
+
+	count, err := p.collection.CountDocuments(context.TODO(), bson.M{
+		"_id":  bson.M{"$neq": item.ID},
+		"name": item.Name,
+	})
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("ItemExists: there is already a item with name %s", item.Name)
+	}
+
 	filter := bson.M{"_id": item.ID}
 	update := bson.M{"$set": item}
-	_, err := p.collection.UpdateOne(context.TODO(), filter, update)
+	_, err = p.collection.UpdateOne(context.TODO(), filter, update)
 	return err
 }
 

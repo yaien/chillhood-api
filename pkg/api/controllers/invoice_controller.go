@@ -14,6 +14,7 @@ import (
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type InvoiceController struct {
@@ -53,11 +54,23 @@ func (i *InvoiceController) Show(w http.ResponseWriter, r *http.Request) {
 }
 
 func (i *InvoiceController) Find(w http.ResponseWriter, r *http.Request) {
-	status := r.URL.Query().Get("status")
+	query := r.URL.Query()
+	status := query.Get("status")
+	search := query.Get("search")
 	filter := bson.M{}
 
 	if status != "" {
 		filter["status"] = status
+	}
+
+	if search != "" {
+		regex := primitive.Regex{Pattern: search, Options: "i"}
+		filter["$or"] = bson.D{
+			{Key: "ref", Value: regex},
+			{Key: "shipping.email", Value: regex},
+			{Key: "shipping.phone", Value: regex},
+			{Key: "shipping.name", Value: regex},
+		}
 	}
 
 	invoices, err := i.Invoices.Find(filter)
