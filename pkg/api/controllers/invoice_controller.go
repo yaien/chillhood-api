@@ -65,11 +65,11 @@ func (i *InvoiceController) Find(w http.ResponseWriter, r *http.Request) {
 
 	if search != "" {
 		regex := primitive.Regex{Pattern: search, Options: "i"}
-		filter["$or"] = bson.D{
-			{Key: "ref", Value: regex},
-			{Key: "shipping.email", Value: regex},
-			{Key: "shipping.phone", Value: regex},
-			{Key: "shipping.name", Value: regex},
+		filter["$or"] = bson.A{
+			bson.M{"ref": regex},
+			bson.M{"shipping.email": regex},
+			bson.M{"shipping.phone": regex},
+			bson.M{"shipping.name": regex},
 		}
 	}
 
