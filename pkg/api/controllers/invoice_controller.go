@@ -58,7 +58,6 @@ func (i *InvoiceController) Find(w http.ResponseWriter, r *http.Request) {
 	status := query.Get("status")
 	search := query.Get("search")
 	filter := bson.M{}
-
 	if status != "" {
 		filter["status"] = status
 	}
@@ -66,10 +65,10 @@ func (i *InvoiceController) Find(w http.ResponseWriter, r *http.Request) {
 	if search != "" {
 		regex := primitive.Regex{Pattern: search, Options: "i"}
 		filter["$or"] = bson.A{
-			bson.M{"ref": regex},
-			bson.M{"shipping.email": regex},
-			bson.M{"shipping.phone": regex},
-			bson.M{"shipping.name": regex},
+			bson.D{{"ref", regex}},
+			bson.D{{"shipping.email", regex}},
+			bson.D{{"shipping.phone", regex}},
+			bson.D{{"shipping.name", regex}},
 		}
 	}
 

@@ -67,6 +67,9 @@ func (s *invoiceService) Find(filter map[string]interface{}) ([]*models.Invoice,
 		}
 		invoices = append(invoices, &invoice)
 	}
+	if invoices == nil {
+		invoices = make([]*models.Invoice, 0)
+	}
 	return invoices, nil
 }
 
