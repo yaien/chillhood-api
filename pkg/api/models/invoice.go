@@ -22,8 +22,9 @@ type Invoice struct {
 type InvoiceStatus string
 
 const (
-	Created  InvoiceStatus = "created"
-	Accepted InvoiceStatus = "accepted"
-	Rejected InvoiceStatus = "rejected"
-	Pending  InvoiceStatus = "pending"
+	Created   InvoiceStatus = "created"
+	Accepted  InvoiceStatus = "accepted"
+	Rejected  InvoiceStatus = "rejected"
+	Pending   InvoiceStatus = "pending"
+	Completed InvoiceStatus = "completed"
 )

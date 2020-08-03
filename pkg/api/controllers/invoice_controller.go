@@ -116,7 +116,7 @@ func (i *InvoiceController) SetTransport(w http.ResponseWriter, r *http.Request)
 		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
-
+	invoice.Status = models.Completed
 	invoice.Shipping.Status = models.Sended
 	invoice.Shipping.Transport = &transport
 	err = i.Invoices.Update(invoice)
