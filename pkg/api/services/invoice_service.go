@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
 	"time"
 
@@ -55,7 +56,9 @@ func (s *invoiceService) GetByRef(ref string) (*models.Invoice, error) {
 
 func (s *invoiceService) Find(filter map[string]interface{}) ([]*models.Invoice, error) {
 	var invoices []*models.Invoice
-	cursor, err := s.invoices.Find(context.TODO(), filter)
+	cursor, err := s.invoices.Find(context.TODO(), filter, &options.FindOptions{
+		Sort: bson.D{{"createdat", -1}},
+	})
 	if err != nil {
 		return nil, err
 	}
