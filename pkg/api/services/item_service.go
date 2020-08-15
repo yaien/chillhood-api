@@ -81,7 +81,7 @@ func (p *itemService) Update(item *models.Item) error {
 	item.UpdatedAt = time.Now()
 
 	count, err := p.collection.CountDocuments(context.TODO(), bson.M{
-		"_id":  bson.M{"$neq": item.ID},
+		"_id":  bson.M{"$ne": item.ID},
 		"name": item.Name,
 	})
 	if err != nil {
