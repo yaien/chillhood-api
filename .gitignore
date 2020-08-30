@@ -1,3 +1,4 @@
-*/**/.env
+.env
+store
 cmd/store/store
 .idea

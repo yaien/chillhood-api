@@ -8,14 +8,16 @@ import (
 )
 
 type service struct {
-	users    services.UserService
-	carts    services.CartService
-	guests   services.GuestService
-	items    services.ItemService
-	epayco   services.EpaycoService
-	invoices services.InvoiceService
-	tokens   services.TokenService
-	config   services.ConfigService
+	users     services.UserService
+	carts     services.CartService
+	guests    services.GuestService
+	items     services.ItemService
+	epayco    services.EpaycoService
+	invoices  services.InvoiceService
+	tokens    services.TokenService
+	config    services.ConfigService
+	cities    services.CityService
+	provinces services.ProvinceService
 }
 
 type middleware struct {
@@ -28,6 +30,8 @@ type module struct {
 }
 
 func bundle(app *core.App) *module {
+	cities := services.NewCityService(app.DB)
+	provinces := services.NewProvinceService(app.DB)
 	items := services.NewItemService(app.DB)
 	users := services.NewUserService(app.DB)
 	carts := services.NewCartService(items)
@@ -39,14 +43,16 @@ func bundle(app *core.App) *module {
 
 	return &module{
 		service: &service{
-			users:    users,
-			carts:    carts,
-			guests:   guests,
-			items:    items,
-			epayco:   epayco,
-			invoices: invoices,
-			tokens:   tokens,
-			config:   config,
+			cities:    cities,
+			provinces: provinces,
+			users:     users,
+			carts:     carts,
+			guests:    guests,
+			items:     items,
+			epayco:    epayco,
+			invoices:  invoices,
+			tokens:    tokens,
+			config:    config,
 		},
 		middleware: &middleware{
 			jwt: &middlewares.JWTGuard{Tokens: tokens, Users: users},

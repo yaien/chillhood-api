@@ -2,7 +2,7 @@ version: "3"
 services:
   cloth-store-api:
     build: .
-    env_file: cmd/store/.env
+    env_file: .env
     environment:
       PORT: 8080
       MONGODB_URI: "mongodb://mongo:27017/store"

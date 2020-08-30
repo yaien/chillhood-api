@@ -15,7 +15,7 @@ import (
 
 func createIndexes() *cobra.Command {
 	return &cobra.Command{
-		Use:   "db:create-indexes",
+		Use:   "db:index",
 		Short: "create database indexes",
 		Run: func(cmd *cobra.Command, args []string) {
 			app, err := core.NewApp()
@@ -51,7 +51,7 @@ var collections = []struct {
 					"shipping.name":  "text",
 					"shipping.phone": "text",
 				},
-				Options: options.Index().SetName("search_text"),
+				Options: options.Index().SetName("search_invoices_text"),
 			},
 			{Keys: bson.M{"ref": 1}, Options: options.Index().SetUnique(true)},
 		},
@@ -70,6 +70,24 @@ var collections = []struct {
 			{
 				Keys:    bson.M{"email": 1},
 				Options: options.Index().SetUnique(true),
+			},
+		},
+	},
+	{
+		name: "cities",
+		indexes: []mongo.IndexModel{
+			{
+				Keys:    bson.M{"name": "text", "province.name": "text"},
+				Options: options.Index().SetName("search_cities_text"),
+			},
+		},
+	},
+	{
+		name: "provinces",
+		indexes: []mongo.IndexModel{
+			{
+				Keys:    bson.M{"name": "text"},
+				Options: options.Index().SetName("search_cities_text"),
 			},
 		},
 	},

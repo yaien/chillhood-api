@@ -16,6 +16,7 @@ func main() {
 		createUser(),
 		createIndexes(),
 		server(),
+		populate(),
 	)
 	err := root.Execute()
 	if err != nil {
