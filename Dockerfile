@@ -7,5 +7,5 @@ RUN GOOS=linux CGO_ENABLED=0 go build ./cmd/store
 
 FROM alpine
 WORKDIR /app
-COPY --from=builder /app/store .
+COPY --from=builder /app/store /app/assets ./
 CMD [ "/app/store", "serve" ]

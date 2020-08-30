@@ -15,7 +15,7 @@ import (
 
 func createIndexes() *cobra.Command {
 	return &cobra.Command{
-		Use:   "db:create-indexes",
+		Use:   "db:index",
 		Short: "create database indexes",
 		Run: func(cmd *cobra.Command, args []string) {
 			app, err := core.NewApp()
