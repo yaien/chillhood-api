@@ -10,6 +10,8 @@ func Register(app *core.App) *mux.Router {
 	router := mux.NewRouter()
 	mod := bundle(app)
 	index(router, mod)
+	city(router, mod)
+	province(router, mod)
 	guest(router, mod)
 	auth(router, mod)
 	cart(router, mod)
