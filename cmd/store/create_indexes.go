@@ -87,7 +87,7 @@ var collections = []struct {
 		indexes: []mongo.IndexModel{
 			{
 				Keys:    bson.M{"name": "text"},
-				Options: options.Index().SetName("search_cities_text"),
+				Options: options.Index().SetName("search_name_text"),
 			},
 		},
 	},
