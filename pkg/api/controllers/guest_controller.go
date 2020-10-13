@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,7 +16,7 @@ type GuestController struct {
 	Guests services.GuestService
 }
 
-func (c *GuestController) Create(w http.ResponseWriter, r *http.Request) {
+func (c *GuestController) Create(w http.ResponseWriter, _ *http.Request) {
 	guest := &models.Guest{}
 	if err := c.Guests.Create(guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
@@ -34,7 +33,6 @@ func (c *GuestController) Param(w http.ResponseWriter, r *http.Request, next htt
 		return
 	}
 	ctx := context.WithValue(r.Context(), "guest", guest)
-	log.Println(guest)
 	next(w, r.WithContext(ctx))
 }
 

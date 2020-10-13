@@ -20,6 +20,7 @@ import (
 type InvoiceController struct {
 	Invoices services.InvoiceService
 	Carts    services.CartService
+	Cities   services.CityService
 }
 
 func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
@@ -32,11 +33,19 @@ func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value("guest").(*models.Guest)
 
 	cart, err := i.Carts.New(payload.Items)
-
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
+
+	city, err := i.Cities.FindOneByNameAndProvince(payload.Shipping.City, payload.Shipping.Province)
+	if err != nil {
+		response.Error(w, fmt.Errorf("CITY_NOT_FOUND: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	cart.Shipping = city.Shipment
+	cart.Refresh()
 
 	invoice := &models.Invoice{Cart: cart, Shipping: payload.Shipping, GuestID: guest.ID}
 	if err := i.Invoices.Create(invoice); err != nil {
