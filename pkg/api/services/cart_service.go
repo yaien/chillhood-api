@@ -46,18 +46,18 @@ func (c *cartService) New(requests []*input.Item) (*models.Cart, error) {
 	for _, request := range requests {
 		id, err := primitive.ObjectIDFromHex(request.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("INVALID_ITEM_ID: %s isn't a a valid object id: %w", request.ID, err)
 		}
 		item, err := c.Items.FindOne(bson.M{"_id": id, "active": true})
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("ITEM_NOT_FOUND: item %s doesn't exist or is inactive: %w", id, err)
 		}
 		size, err := item.Size(request.Size)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("INVALID_SIZE: %w", err)
 		}
 		if request.Quantity > size.Existence {
-			return nil, fmt.Errorf("there is only %d %s (id: %s, size: %s) items, requested %d",
+			return nil, fmt.Errorf("SOLD_OUT: there is only %d %s (id: %s, size: %s) items, requested %d",
 				size.Existence, item.Name, id, size.Label, request.Quantity)
 		}
 

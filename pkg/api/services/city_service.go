@@ -19,6 +19,7 @@ type SearchCityOptions struct {
 type CityService interface {
 	Search(opts SearchCityOptions) ([]*models.City, error)
 	FindOneByID(id primitive.ObjectID) (*models.City, error)
+	FindOneByNameAndProvince(name, province string) (*models.City, error)
 }
 
 type cityService struct {
@@ -58,6 +59,15 @@ func (c cityService) Search(opts SearchCityOptions) ([]*models.City, error) {
 func (c cityService) FindOneByID(id primitive.ObjectID) (*models.City, error) {
 	var city models.City
 	err := c.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&city)
+	if err != nil {
+		return nil, err
+	}
+	return &city, nil
+}
+
+func (c cityService) FindOneByNameAndProvince(name, province string) (*models.City, error) {
+	var city models.City
+	err := c.collection.FindOne(context.TODO(), bson.M{"name": name, "province.name": province}).Decode(&city)
 	if err != nil {
 		return nil, err
 	}
