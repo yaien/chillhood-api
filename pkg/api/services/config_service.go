@@ -7,7 +7,7 @@ import (
 
 // ConfigService interface
 type ConfigService interface {
-	Cloudinary() *core.ClodinaryConfig
+	Cloudinary() *core.CloudinaryConfig
 	Epayco() *epayco.CheckoutArgs
 }
 
@@ -15,7 +15,7 @@ type configService struct {
 	config *core.Config
 }
 
-func (cs *configService) Cloudinary() *core.ClodinaryConfig {
+func (cs *configService) Cloudinary() *core.CloudinaryConfig {
 	return cs.config.Cloudinary
 }
 

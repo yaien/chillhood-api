@@ -25,6 +25,7 @@ type epaycoService struct {
 	invoices InvoiceService
 	carts    CartService
 	guests   GuestService
+	slack    SlackService
 	config   *core.EpaycoConfig
 	baseURL  *url.URL
 }
@@ -84,7 +85,8 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
 				return nil, err
 			}
-			break
+			e.slack.NotifySale(invoice)
+			// TODO: send email notification to the user client
 		case epayco.Pending:
 			invoice.Status = models.Pending
 			if !invoice.Cart.Executed {
@@ -95,7 +97,6 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
 				return nil, err
 			}
-			break
 		default:
 			invoice.Status = models.Rejected
 			if err := e.carts.Revert(invoice.Cart); err != nil {
@@ -117,6 +118,14 @@ func NewEpaycoService(
 	baseURL *url.URL,
 	invoiceSrv InvoiceService,
 	cartSrv CartService,
-	guestSrv GuestService) EpaycoService {
-	return &epaycoService{invoiceSrv, cartSrv, guestSrv, config, baseURL}
+	guestSrv GuestService,
+	slackSrv SlackService) EpaycoService {
+	return &epaycoService{
+		invoiceSrv,
+		cartSrv,
+		guestSrv,
+		slackSrv,
+		config,
+		baseURL,
+	}
 }

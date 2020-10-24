@@ -28,9 +28,15 @@ type ClientConfig struct {
 	Origins []string
 }
 
-type ClodinaryConfig struct {
+type CloudinaryConfig struct {
 	CloudName    string
 	UploadPreset string
+}
+
+type SlackConfig struct {
+	Channel     string
+	AccessToken string
+	SaleUrl     string
 }
 
 // Config -> environment variable settings
@@ -42,7 +48,8 @@ type Config struct {
 	Epayco     *EpaycoConfig
 	JWT        *JWTConfig
 	Client     *ClientConfig
-	Cloudinary *ClodinaryConfig
+	Cloudinary *CloudinaryConfig
+	Slack      *SlackConfig
 }
 
 func address() string {
@@ -91,9 +98,14 @@ func load() *Config {
 			Keys:    strings.Split(os.Getenv("CLIENT_KEYS"), ","),
 			Origins: strings.Split(os.Getenv("CLIENT_ORIGIN"), ","),
 		},
-		Cloudinary: &ClodinaryConfig{
+		Cloudinary: &CloudinaryConfig{
 			CloudName:    os.Getenv("CLOUDINARY_CLOUD_NAME"),
 			UploadPreset: os.Getenv("CLOUDINARY_UPLOAD_PRESET"),
+		},
+		Slack: &SlackConfig{
+			AccessToken: os.Getenv("SLACK_ACCESS_TOKEN"),
+			Channel:     os.Getenv("SLACK_CHANNEL"),
+			SaleUrl:     os.Getenv("SLACK_SALE_URL"),
 		},
 	}
 }
