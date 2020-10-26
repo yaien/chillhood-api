@@ -11,6 +11,7 @@ func invoice(router *mux.Router, mod *module) {
 		Invoices: mod.service.invoices,
 		Carts:    mod.service.carts,
 		Cities:   mod.service.cities,
+		Emails:   mod.service.email,
 	}
 	guest := &controllers.GuestController{
 		Guests: mod.service.guests,
