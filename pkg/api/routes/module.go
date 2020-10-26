@@ -19,6 +19,7 @@ type service struct {
 	cities    services.CityService
 	provinces services.ProvinceService
 	slack     services.SlackService
+	email     services.EmailService
 }
 
 type middleware struct {
@@ -31,6 +32,7 @@ type module struct {
 }
 
 func bundle(app *core.App) *module {
+	email := services.NewEmailService(app.Config.SMTP, app.Templates)
 	cities := services.NewCityService(app.DB)
 	provinces := services.NewProvinceService(app.DB)
 	items := services.NewItemService(app.DB)
@@ -39,7 +41,7 @@ func bundle(app *core.App) *module {
 	guests := services.NewGuestService(app.DB)
 	invoices := services.NewInvoiceService(app.DB)
 	slack := services.NewSlackService(app.Slack, app.Config.Slack)
-	epayco := services.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL, invoices, carts, guests, slack)
+	epayco := services.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL, invoices, carts, guests, slack, email)
 	tokens := services.NewTokenService(app.Config.Client, app.Config.JWT, users)
 	config := services.NewConfigService(app.Config)
 
@@ -56,6 +58,7 @@ func bundle(app *core.App) *module {
 			tokens:    tokens,
 			config:    config,
 			slack:     slack,
+			email:     email,
 		},
 		middleware: &middleware{
 			jwt: &middlewares.JWTGuard{Tokens: tokens, Users: users},
