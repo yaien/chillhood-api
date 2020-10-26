@@ -21,6 +21,7 @@ type InvoiceController struct {
 	Invoices services.InvoiceService
 	Carts    services.CartService
 	Cities   services.CityService
+	Emails   services.EmailService
 }
 
 func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
@@ -133,5 +134,6 @@ func (i *InvoiceController) SetTransport(w http.ResponseWriter, r *http.Request)
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
+	i.Emails.NotifyTransport(invoice)
 	response.Send(w, invoice)
 }

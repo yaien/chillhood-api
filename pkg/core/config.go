@@ -39,6 +39,18 @@ type SlackConfig struct {
 	SaleUrl     string
 }
 
+type SMTPConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	Sender   string
+}
+
+func (s *SMTPConfig) Address() string {
+	return fmt.Sprintf("%s:%s", s.Host, s.Port)
+}
+
 // Config -> environment variable settings
 type Config struct {
 	Production bool
@@ -50,6 +62,7 @@ type Config struct {
 	Client     *ClientConfig
 	Cloudinary *CloudinaryConfig
 	Slack      *SlackConfig
+	SMTP       *SMTPConfig
 }
 
 func address() string {
@@ -106,6 +119,13 @@ func load() *Config {
 			AccessToken: os.Getenv("SLACK_ACCESS_TOKEN"),
 			Channel:     os.Getenv("SLACK_CHANNEL"),
 			SaleUrl:     os.Getenv("SLACK_SALE_URL"),
+		},
+		SMTP: &SMTPConfig{
+			Host:     os.Getenv("SMTP_HOST"),
+			Port:     os.Getenv("SMTP_PORT"),
+			Username: os.Getenv("SMTP_USERNAME"),
+			Password: os.Getenv("SMTP_PASSWORD"),
+			Sender:   os.Getenv("SMTP_SENDER"),
 		},
 	}
 }
