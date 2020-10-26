@@ -23,7 +23,7 @@ func (e *emailService) NotifySale(invoice *models.Invoice) {
 	var buffer bytes.Buffer
 	err := e.templates.Sale.Execute(&buffer, invoice)
 	if err != nil {
-		log.Printf("failed execiting sale template for invoice #%s: %w", invoice.Ref, err)
+		log.Printf("failed execiting sale template for invoice #%s: %s", invoice.Ref, err.Error())
 		return
 	}
 	m := &email.Email{
@@ -37,7 +37,7 @@ func (e *emailService) NotifySale(invoice *models.Invoice) {
 	auth := smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.Host)
 	err = m.Send(e.config.Address(), auth)
 	if err != nil {
-		log.Printf("failed sending sale email for invoice #%s: %w", invoice.Ref, err)
+		log.Printf("failed sending sale email for invoice #%s: %s", invoice.Ref, err.Error())
 	}
 }
 
@@ -45,7 +45,7 @@ func (e *emailService) NotifyTransport(invoice *models.Invoice) {
 	var buffer bytes.Buffer
 	err := e.templates.Transport.Execute(&buffer, invoice)
 	if err != nil {
-		log.Printf("failed execiting sale template for invoice #%s: %w", invoice.Ref, err)
+		log.Printf("failed execiting sale template for invoice #%s: %s", invoice.Ref, err.Error())
 		return
 	}
 	m := &email.Email{
@@ -59,7 +59,7 @@ func (e *emailService) NotifyTransport(invoice *models.Invoice) {
 	auth := smtp.PlainAuth("", e.config.Username, e.config.Password, e.config.Host)
 	err = m.Send(e.config.Address(), auth)
 	if err != nil {
-		log.Printf("failed sending sale email for invoice #%s: %w", invoice.Ref, err)
+		log.Printf("failed sending sale email for invoice #%s: %s", invoice.Ref, err.Error())
 	}
 }
 
