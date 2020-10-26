@@ -11,11 +11,11 @@ type Templates struct {
 }
 
 func parseTemplates() (*Templates, error) {
-	sale, err := template.ParseFiles("assets/parseTemplates/sale.html")
+	sale, err := template.ParseFiles("assets/templates/sale.html")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse sale template: %w", err)
 	}
-	transport, err := template.ParseFiles("assets/parseTemplates/transport.html")
+	transport, err := template.ParseFiles("assets/templates/transport.html")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse transport template: %w", err)
 	}
