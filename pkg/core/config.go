@@ -45,6 +45,7 @@ type SMTPConfig struct {
 	Username string
 	Password string
 	Sender   string
+	RefLink  string
 }
 
 func (s *SMTPConfig) Address() string {
@@ -126,6 +127,7 @@ func load() *Config {
 			Username: os.Getenv("SMTP_USERNAME"),
 			Password: os.Getenv("SMTP_PASSWORD"),
 			Sender:   os.Getenv("SMTP_SENDER"),
+			RefLink:  os.Getenv("SMTP_REF_LINK"),
 		},
 	}
 }
