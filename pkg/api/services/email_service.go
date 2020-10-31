@@ -2,11 +2,15 @@ package services
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/dustin/go-humanize"
 	"github.com/jordan-wright/email"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/core"
+	"html/template"
 	"log"
 	"net/smtp"
+	"strings"
 )
 
 type EmailService interface {
@@ -17,6 +21,20 @@ type EmailService interface {
 type emailService struct {
 	config    *core.SMTPConfig
 	templates *core.Templates
+}
+
+func (e *emailService) functions() template.FuncMap {
+	return template.FuncMap{
+		"first": func(name string) string {
+			return strings.Split(name, " ")[0]
+		},
+		"link": func(ref string) string {
+			return strings.ReplaceAll(e.config.RefLink, "{ref}", ref)
+		},
+		"currency": func(value int) string {
+			return fmt.Sprintf("$%s", humanize.Comma(int64(value)))
+		},
+	}
 }
 
 func (e *emailService) NotifySale(invoice *models.Invoice) {

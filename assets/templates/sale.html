@@ -1,1 +1,181 @@
-Compra realizada por el valor {{.Cart.Total}} Ref: {{.Ref}}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <!-- Meta -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Your Affinity order confirmation - R6500600</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic|Open+Sans:400,600,700,300,300italic,400italic"
+          rel="stylesheet" type="text/css"/>
+
+    <!-- CSS -->
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica Neue, Helvetica, sans-serif, 'Open Sans';
+        }
+
+        [style*="Open Sans"] {
+            font-family: 'Open Sans', Helvetica Neue, Helvetica, sans-serif !important;
+        }
+
+        header {
+            font-family: Helvetica Neue, Helvetica, sans-serif, 'Lato';
+        }
+
+        [style*="Lato"] {
+            font-family: 'Lato', Helvetica Neue, Helvetica, sans-serif !important;
+        }
+
+        a[x-apple-data-detectors=true] {
+            color: inherit !important;
+            text-decoration: inherit !important;
+        }
+
+        a:link {
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Email header -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="border-top:5px solid #a00;" align="center"></td>
+    </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td bgcolor="#ffffff" align="center">
+
+            <table border="0"
+                   cellpadding="0"
+                   cellspacing="0"
+                   width="90%"
+                   style="max-width: 600px; margin-top: 60px">
+
+                <tr>
+                    <td align="center"
+                        valign="top"
+                        style="color: #2b2b2b; font-family: Helvetica Neue,Helvetica,sans-serif,Lato; font-size: 34px; font-weight: 400; mso-line-height-rule:exactly; line-height:38px; margin: 0; padding: 0px 0px 6px 0px;"
+                        colspan="3">
+                        Gracias por tu compra!
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center"
+                        valign="top"
+                        style="padding: 0px 0px 26px 0px; border-bottom:1px solid #dfe5e9; color: #9c9c9c; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 18px; font-weight: 400; mso-line-height-rule:exactly; line-height:27px; margin: 0"
+                        colspan="3">
+                        Referencia: {{.Ref}}
+                    </td>
+                </tr>
+
+                <!-- Email body -->
+                <tr>
+                    <td align="center" valign="top"
+                        style="padding: 36px 0px 6px 0px; color: #2b2b2b; font-family: Helvetica Neue,Helvetica,sans-serif,Lato; font-size: 20px; font-weight: 400; mso-line-height-rule:exactly; line-height:30px; margin: 0; text-align:left"
+                        colspan="3">
+                        Hola {{first .Shipping.Name}},
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center"
+                        valign="top"
+                        style="padding: 0px 0px 24px 0px; color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 17px; font-weight: 400; mso-line-height-rule:exactly; line-height:25px; margin: 0; text-align:left"
+                        colspan="3">
+                        Encuentra el resumen de tu pedido a continuación
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" valign="top" style="padding: 30px 30px 30px 30px; margin-bottom: 36px"
+                        bgcolor="#f9f9f9" colspan="3">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td colspan="3"
+                                    style="color: #2b2b2b; font-family: Helvetica Neue,Helvetica,sans-serif,Lato; font-size: 20px; font-weight: 400; mso-line-height-rule:exactly; line-height: 30px; margin: 0; text-align:left; padding: 0px 0px 10px 0px;">
+                                    Resumen de compra
+                                </td>
+                            </tr>
+                            {{range .Cart.Items}}
+                                <tr>
+                                    <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; text-align:left;">
+                                        {{.Name}} ({{.Size}})
+                                    </td>
+                                    <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; text-align:right;">
+                                        {{.Quantity}}
+                                    </td>
+                                    <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; text-align:right; ">
+                                        {{currency .Price}}
+                                    </td>
+                                </tr>
+                            {{end}}
+                            <tr>
+                                <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; padding: 5px 0; text-align:left"
+                                    colspan="2">
+                                    Subtotal
+                                </td>
+                                <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; padding: 5px 0; text-align:right">
+                                    {{currency .Cart.Subtotal}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; padding: 5px 0; text-align:left"
+                                    colspan="2">
+                                    Costo de envío
+                                </td>
+                                <td style="color: #777777; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 15px; font-weight: 400; mso-line-height-rule:exactly; line-height: 22px; margin: 0; padding: 5px 0; text-align:right">
+                                    {{currency .Cart.Shipping}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color: #2b2b2b; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 20px; font-weight: 400; mso-line-height-rule:exactly; line-height: 30px; margin: 0; border-top:1px solid #dfe5e9; padding: 10px 0px 0px 0px; text-align:left;"
+                                    colspan="2">
+                                    Total
+                                </td>
+                                <td style="color: #2b2b2b; font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans; font-size: 20px; font-weight: 400; mso-line-height-rule:exactly; line-height: 30px; margin: 0; border-top:1px solid #dfe5e9; text-align:right; padding: 10px 0px 0px 0px;">
+                                    {{currency .Cart.Total}}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0 0 24px 0" colspan="3"></td>
+                </tr>
+                <tr>
+                    <td align="center" valign="top" style="padding: 12px 0px 36px 0px;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                            <tr>
+                                <td align="center" bgcolor="#a00" width="210"
+                                    style="-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px;">
+                                    <a href="{{link .Ref}}"
+                                       style="padding: 18px;width:210px;display: block;text-decoration: none;border:0;text-align: center;font-size: 14px;font-family: Helvetica Neue,Helvetica,sans-serif,Open Sans;letter-spacing:1px;color: #ffffff;background: #a00;border: 1px solid #a00;-moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; mso-line-height-rule:exactly;line-height:17px;text-transform:uppercase;">
+                                        mira tu pedido aquí
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+            </table>
+
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
+    </tr>
+</table>
+</body>
+</html>
