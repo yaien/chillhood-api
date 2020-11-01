@@ -39,14 +39,7 @@ func (e *EpaycoController) Response(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e *EpaycoController) Confirmation(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		e := fmt.Errorf("failed parsing form: %w", err)
-		log.Println("epayco confirmation:", e.Error())
-		response.Error(w, e, http.StatusBadRequest)
-		return
-	}
-	ref := r.Form.Get("x_ref_payco")
+	ref := r.FormValue("x_ref_payco")
 	fmt.Println("epayco confirmation ref:", ref)
 	res, err := e.Epayco.Request(ref)
 	if err != nil {
