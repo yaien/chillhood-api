@@ -18,7 +18,7 @@ import (
 type EpaycoService interface {
 	Request(ref string) (*epayco.Response, error)
 	Verify(payment *epayco.Payment) bool
-	Process(res *epayco.Response) (*models.Invoice, error)
+	Process(payment *epayco.Payment) (*models.Invoice, error)
 }
 
 type epaycoService struct {
@@ -58,23 +58,20 @@ func (e *epaycoService) Verify(payment *epayco.Payment) bool {
 	return signature == payment.Signature
 }
 
-func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
-	if !res.Success {
-		return nil, errors.New("UNSUCCESSFULL_RESPONSE")
-	}
+func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error) {
 
-	if !e.Verify(res.Data) {
+	if !e.Verify(payment) {
 		return nil, errors.New("INVALID_SIGNATURE")
 	}
 
-	invoice, err := e.invoices.GetByRef(res.Data.Invoice)
+	invoice, err := e.invoices.GetByRef(payment.Invoice)
 
 	if err != nil {
 		return nil, fmt.Errorf("INVOICE_NOT_FOUND: %s", err.Error())
 	}
 
 	if invoice.Status != models.Accepted {
-		switch res.Data.ResponseCode {
+		switch payment.ResponseCode {
 		case epayco.Accepted:
 			invoice.Status = models.Accepted
 			invoice.Shipping.Status = models.Preparing
@@ -106,7 +103,7 @@ func (e *epaycoService) Process(res *epayco.Response) (*models.Invoice, error) {
 		}
 	}
 
-	invoice.Payment = res.Data
+	invoice.Payment = payment
 	if err := e.invoices.Update(invoice); err != nil {
 		return nil, err
 	}

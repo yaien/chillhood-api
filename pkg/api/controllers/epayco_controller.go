@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"github.com/yaien/clothes-store-api/pkg/api/helpers/epayco"
 	"log"
 	"net/http"
 
@@ -28,7 +29,12 @@ func (e *EpaycoController) Response(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoice, err := e.Epayco.Process(res)
+	if !res.Success {
+		response.Error(w, errors.New("UNSUCCESSFULL_RESPONSE"), http.StatusBadRequest)
+		return
+	}
+
+	invoice, err := e.Epayco.Process(res.Data)
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)
 		return
@@ -39,17 +45,8 @@ func (e *EpaycoController) Response(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e *EpaycoController) Confirmation(w http.ResponseWriter, r *http.Request) {
-	ref := r.FormValue("x_ref_payco")
-	fmt.Println("epayco confirmation ref:", ref)
-	res, err := e.Epayco.Request(ref)
-	if err != nil {
-		e := fmt.Errorf("REF_NOT_FOUND: %s", err.Error())
-		log.Println("epayco confirmation:", e.Error())
-		response.Error(w, e, http.StatusNotFound)
-		return
-	}
-	log.Printf("response %+v\n", res)
-	invoice, err := e.Epayco.Process(res)
+	payment := epayco.ParsePaymentFromRequest(r)
+	invoice, err := e.Epayco.Process(payment)
 	if err != nil {
 		e := fmt.Errorf("failed proccessing: %w", err)
 		log.Println("epayco confirmation:", e.Error())

@@ -1,5 +1,10 @@
 package epayco
 
+import (
+	"net/http"
+	"strconv"
+)
+
 // Payment -> epayco payment data
 type Payment struct {
 	Ref              int          `json:"x_ref_payco"`
@@ -54,3 +59,37 @@ const (
 	Canceled  ResponseCode = 11
 	AntiFraud ResponseCode = 12
 )
+
+func atoi(s string) int {
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return 0
+	}
+	return v
+}
+
+func ParsePaymentFromRequest(r *http.Request) *Payment {
+	return &Payment{
+		Ref:              atoi(r.FormValue("x_ref_payco")),
+		Invoice:          r.FormValue("x_id_invoice"),
+		Description:      r.FormValue("x_description"),
+		Amount:           atoi(r.FormValue("x_amount")),
+		AmountContry:     atoi(r.FormValue("x_amount_country")),
+		AmountOk:         atoi(r.FormValue("x_amount_ok")),
+		AmountBase:       atoi(r.FormValue("x_amount_base")),
+		Tax:              atoi(r.FormValue("x_tax")),
+		CurrencyCode:     r.FormValue("x_currency_code"),
+		BankName:         r.FormValue("x_bank_name"),
+		Cardnumber:       r.FormValue("x_cardnumber"),
+		Quotas:           r.FormValue("x_quotas"),
+		Response:         r.FormValue("x_response"),
+		ResponseCode:     ResponseCode(atoi(r.FormValue("x_cod_response"))),
+		ApprovalCode:     r.FormValue("x_approval_code"),
+		TransactionID:    r.FormValue("x_transaction_id"),
+		TransactionDate:  r.FormValue("x_transaction_date"),
+		TransactionState: r.FormValue("x_transaction_state"),
+		Franchise:        r.FormValue("x_franchise"),
+		Test:             r.FormValue("x_test_request"),
+		Signature:        r.FormValue("x_signature"),
+	}
+}
