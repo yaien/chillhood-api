@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
@@ -40,18 +41,24 @@ func (e *EpaycoController) Response(w http.ResponseWriter, r *http.Request) {
 func (e *EpaycoController) Confirmation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		response.Error(w, fmt.Errorf("failed parsing form: %w", err), http.StatusBadRequest)
+		e := fmt.Errorf("failed parsing form: %w", err)
+		log.Println("epayco confirmation:", e.Error())
+		response.Error(w, e, http.StatusBadRequest)
 		return
 	}
 	ref := r.Form.Get("x_ref_payco")
 	res, err := e.Epayco.Request(ref)
 	if err != nil {
-		response.Error(w, fmt.Errorf("REF_NOT_FOUND: %s", err.Error()), http.StatusNotFound)
+		e := fmt.Errorf("REF_NOT_FOUND: %s", err.Error())
+		log.Println("epayco confirmation:", e.Error())
+		response.Error(w, e, http.StatusNotFound)
 		return
 	}
 	invoice, err := e.Epayco.Process(res)
 	if err != nil {
-		response.Error(w, err, http.StatusBadRequest)
+		e := fmt.Errorf("failed proccessing: %w", err)
+		log.Println("epayco confirmation:", e.Error())
+		response.Error(w, e, http.StatusBadRequest)
 		return
 	}
 	response.Send(w, invoice)
