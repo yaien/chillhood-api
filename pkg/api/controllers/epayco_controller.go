@@ -47,6 +47,7 @@ func (e *EpaycoController) Confirmation(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	ref := r.Form.Get("x_ref_payco")
+	fmt.Println("epayco confirmation ref:", ref)
 	res, err := e.Epayco.Request(ref)
 	if err != nil {
 		e := fmt.Errorf("REF_NOT_FOUND: %s", err.Error())
