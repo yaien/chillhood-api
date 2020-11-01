@@ -28,11 +28,11 @@ var funcs = func(config *Config) template.FuncMap {
 
 func parseTemplates(config *Config) (*Templates, error) {
 	fn := funcs(config)
-	sale, err := template.New("sale").Funcs(fn).ParseFiles("assets/templates/sale.html")
+	sale, err := template.New("sale.html").Funcs(fn).ParseFiles("assets/templates/sale.html")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse sale template: %w", err)
 	}
-	transport, err := template.New("transport").Funcs(fn).ParseFiles("assets/templates/transport.html")
+	transport, err := template.New("transport.html").Funcs(fn).ParseFiles("assets/templates/transport.html")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse transport template: %w", err)
 	}
