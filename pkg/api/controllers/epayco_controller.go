@@ -48,6 +48,7 @@ func (e *EpaycoController) Confirmation(w http.ResponseWriter, r *http.Request) 
 		response.Error(w, e, http.StatusNotFound)
 		return
 	}
+	log.Printf("response %+v\n", res)
 	invoice, err := e.Epayco.Process(res)
 	if err != nil {
 		e := fmt.Errorf("failed proccessing: %w", err)
