@@ -45,14 +45,14 @@ func (e *emailService) NotifyTransport(invoice *models.Invoice) {
 	var buffer bytes.Buffer
 	err := e.templates.Transport.Execute(&buffer, invoice)
 	if err != nil {
-		log.Printf("failed execiting sale template for invoice #%s: %s", invoice.Ref, err.Error())
+		log.Printf("failed executing sale template for invoice #%s: %s", invoice.Ref, err.Error())
 		return
 	}
 	m := &email.Email{
 		ReplyTo: nil,
 		From:    e.config.Sender,
 		To:      []string{invoice.Shipping.Email},
-		Subject: "¡Tu compra esta en camino!",
+		Subject: "¡Tu pedido esta en camino!",
 		HTML:    buffer.Bytes(),
 	}
 

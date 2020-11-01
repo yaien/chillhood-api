@@ -17,6 +17,8 @@ func main() {
 		createIndexes(),
 		server(),
 		populate(),
+		sendSaleEmail(),
+		sendTransportEmail(),
 	)
 	err := root.Execute()
 	if err != nil {
