@@ -10,6 +10,9 @@ import (
 type Size struct {
 	Label     string `json:"label"`
 	Existence int    `json:"existence"`
+	Body      int    `json:"body"`
+	Chest     int    `json:"chest"`
+	Sleeve    int    `json:"sleeve"`
 }
 
 type Item struct {
