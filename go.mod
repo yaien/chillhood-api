@@ -13,7 +13,6 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/jordan-wright/email v4.0.1-0.20200917010138-e1c00e156980+incompatible
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/slack-go/slack v0.7.2
 	github.com/spf13/cobra v0.0.5
