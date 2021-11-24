@@ -10,7 +10,7 @@ jobs:
         with:
           go-version: 1.17
       - name: Deploy in Heroku
-        uses: ctaveras/heroku-deploy@v1.0.0
+        uses: Techmmunity/docker-heroku-deploy@v1.0.0
         with:
           email: ${{secrets.HEROKU_EMAIL}}
           api_key: ${{ secrets.HEROKU_API_KEY }}
