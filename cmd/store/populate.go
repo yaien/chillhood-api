@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/yaien/clothes-store-api/assets"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/core"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 func populate() *cobra.Command {
@@ -37,10 +37,11 @@ func populateCities(db *mongo.Database) error {
 		Province string `yaml:"province"`
 		Shipment int    `yaml:"shipment"`
 	}
-	source, err := ioutil.ReadFile("assets/seeders/cities.yaml")
+	source, err := assets.FS().ReadFile("seeders/cities.yaml")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed reading seeder file: %w", err)
 	}
+
 	if err := yaml.Unmarshal(source, &cities); err != nil {
 		return err
 	}

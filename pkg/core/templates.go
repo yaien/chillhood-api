@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/yaien/clothes-store-api/assets"
 	"html/template"
 	"strings"
 )
@@ -28,11 +29,12 @@ var funcs = func(config *Config) template.FuncMap {
 
 func parseTemplates(config *Config) (*Templates, error) {
 	fn := funcs(config)
-	sale, err := template.New("sale.html").Funcs(fn).ParseFiles("assets/templates/sale.html")
+	fs := assets.FS()
+	sale, err := template.New("sale.html").Funcs(fn).ParseFS(fs, "templates/sale.html")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse sale template: %w", err)
 	}
-	transport, err := template.New("transport.html").Funcs(fn).ParseFiles("assets/templates/transport.html")
+	transport, err := template.New("transport.html").Funcs(fn).ParseFS(fs, "templates/transport.html")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse transport template: %w", err)
 	}
