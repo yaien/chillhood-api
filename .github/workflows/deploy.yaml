@@ -9,17 +9,9 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.17
-      - name: Install Heroku
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-      - name: Login in Heroku
-        run: heroku container:login
-      - name: Push Container
-        run: heroku container:push web --app ${{secrets.HEROKU_APP}}
-      - name: Release Container
-        run: heroku container:release web --app ${{secrets.HEROKU_APP}}
-
-
-
-
-
-
+      - name: Deploy in Heroku
+        uses: ctaveras/heroku-deploy@v1.0.0
+        with:
+          email: ${{secrets.HEROKU_EMAIL}}
+          api_key: ${{ secrets.HEROKU_API_KEY }}
+          app_name: ${{ secrets.HEROKU_APP_NAME }}
