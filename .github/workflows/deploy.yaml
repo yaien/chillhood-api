@@ -1,0 +1,25 @@
+name: Deploy
+on: push
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Install Heroku
+        run: curl https://cli-assets.heroku.com/install.sh | sh
+      - name: Login in Heroku
+        run: heroku container:login
+      - name: Push Container
+        run: heroku container:push web --app ${{secrets.HEROKU_APP}}
+      - name: Release Container
+        run: heroku container:release web --app ${{secrets.HEROKU_APP}}
+
+
+
+
+
+
