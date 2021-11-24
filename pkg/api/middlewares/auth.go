@@ -25,7 +25,7 @@ func (g *JWTGuard) ServeHTTP(w http.ResponseWriter, r *http.Request, next http.H
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	id, err := primitive.ObjectIDFromHex(claims.Id)
+	id, err := primitive.ObjectIDFromHex(claims.Jti)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
