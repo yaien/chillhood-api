@@ -3,9 +3,9 @@ package services
 import (
 	"errors"
 	"fmt"
+	"github.com/o1egl/paseto"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/auth"
 	"github.com/yaien/clothes-store-api/pkg/core"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,7 +13,7 @@ import (
 
 type TokenService interface {
 	FromPassword(login *auth.Login) (*auth.Response, error)
-	Decode(token string) (*jwt.StandardClaims, error)
+	Decode(token string) (*paseto.JSONToken, error)
 }
 
 type tokenService struct {
@@ -39,26 +39,27 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 
 	user, err := s.Users.FindOne(bson.M{"email": login.Username})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed finding user: %w", err)
 	}
 	if err := user.VerifyPassword(login.Password); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("IVALID_PASSWORD: %w", err)
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		Audience:  login.ClientID,
-		ExpiresAt: time.Now().Add(s.Config.Duration).Unix(),
-		Id:        user.ID.Hex(),
-		IssuedAt:  time.Now().Unix(),
-		Subject:   "user",
-	})
 
-	accessToken, err := token.SignedString(s.Config.Secret)
+	claims := paseto.JSONToken{
+		Audience:   login.ClientID,
+		Expiration: time.Now().Add(s.Config.Duration),
+		IssuedAt:   time.Now(),
+		Jti:        user.ID.Hex(),
+	}
+
+	v2 := paseto.V2{}
+	token, err := v2.Encrypt(s.Config.Secret, claims, "")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed encrypt: %w", err)
 	}
 
 	response := &auth.Response{
-		AccessToken: accessToken,
+		AccessToken: token,
 		TokenType:   "Bearer",
 		ExpiresIn:   int(s.Config.Duration.Seconds()),
 	}
@@ -66,17 +67,14 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 	return response, nil
 }
 
-func (s *tokenService) Decode(tokenStr string) (*jwt.StandardClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
-		return s.Config.Secret, nil
-	})
+func (s *tokenService) Decode(token string) (*paseto.JSONToken, error) {
+	var claims paseto.JSONToken
+	var v2 paseto.V2
+	err := v2.Decrypt(token, s.Config.Secret, &claims, "")
 	if err != nil {
 		return nil, err
 	}
-	return token.Claims.(*jwt.StandardClaims), nil
+	return &claims, nil
 }
 
 func NewTokenService(client *core.ClientConfig, config *core.JWTConfig, users UserService) TokenService {
