@@ -1,5 +1,9 @@
-name: Deploy
-on: push
+name: Deploy in Heroku
+on:
+  push:
+    branches:
+      - develop
+
 
 jobs:
   deploy:
