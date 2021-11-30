@@ -33,11 +33,11 @@ type InvoiceRepository interface {
 	Create(ctx context.Context, invoice *Invoice) error
 	FindOneByID(ctx context.Context, id string) (*Invoice, error)
 	FindOneByRef(ctx context.Context, ref string) (*Invoice, error)
-	Search(ctx context.Context, opts InvoiceSearchOptions) ([]*Invoice, error)
+	Search(ctx context.Context, opts SearchInvoiceOptions) ([]*Invoice, error)
 	Update(ctx context.Context, invoice *Invoice) error
 }
 
-type InvoiceSearchOptions struct {
+type SearchInvoiceOptions struct {
 	Query  string
 	Status InvoiceStatus
 }

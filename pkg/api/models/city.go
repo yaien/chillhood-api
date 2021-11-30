@@ -8,8 +8,15 @@ type Province struct {
 }
 
 type ProvinceRepository interface {
+	Search(ctx context.Context, options SearchProvinceOptions) ([]*Province, error)
 	FindOneByName(ctx context.Context, name string) (*Province, error)
 	Create(ctx context.Context, pr *Province) error
+}
+
+type SearchProvinceOptions struct {
+	Name  string
+	Skip  int64
+	Limit int64
 }
 
 type City struct {

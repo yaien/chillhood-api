@@ -48,7 +48,7 @@ func (m MongoInvoiceRepository) FindOneByRef(ctx context.Context, ref string) (*
 	return nil, err
 }
 
-func (m MongoInvoiceRepository) Search(ctx context.Context, opts models.InvoiceSearchOptions) ([]*models.Invoice, error) {
+func (m MongoInvoiceRepository) Search(ctx context.Context, opts models.SearchInvoiceOptions) ([]*models.Invoice, error) {
 	filter := bson.M{}
 	if len(opts.Status) > 0 {
 		filter["status"] = opts.Status
