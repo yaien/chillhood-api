@@ -34,7 +34,7 @@ type module struct {
 
 func bundle(app *core.App) *module {
 	email := services.NewEmailService(app.Config.SMTP, app.Templates)
-	cities := services.NewCityService(app.DB)
+	cities := services.NewCityService(repository.NewMongoCityRepository(app.DB))
 	provinces := services.NewProvinceService(app.DB)
 	items := services.NewItemService(repository.NewMongoItemRepository(app.DB))
 	users := services.NewUserService(repository.NewMongoUserRepository(app.DB))

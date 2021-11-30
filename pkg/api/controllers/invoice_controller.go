@@ -39,7 +39,10 @@ func (i *InvoiceController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	city, err := i.Cities.FindOneByNameAndProvince(payload.Shipping.City, payload.Shipping.Province)
+	city, err := i.Cities.FindOne(r.Context(), models.FindOneCityOptions{
+		Name:         payload.Shipping.City,
+		ProvinceName: payload.Shipping.Province,
+	})
 	if err != nil {
 		response.Error(w, fmt.Errorf("CITY_NOT_FOUND: %w", err), http.StatusBadRequest)
 		return

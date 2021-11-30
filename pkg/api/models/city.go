@@ -21,12 +21,20 @@ type City struct {
 }
 
 type CityRepository interface {
+	Search(ctx context.Context, opts SearchCityOptions) ([]*City, error)
 	FindOne(ctx context.Context, opts FindOneCityOptions) (*City, error)
 	Create(ctx context.Context, city *City) error
 	Update(ctx context.Context, city *City) error
 }
 
 type FindOneCityOptions struct {
-	Name       string
-	ProvinceID string
+	Name         string
+	ProvinceID   string
+	ProvinceName string
+}
+type SearchCityOptions struct {
+	Name     string
+	Province string
+	Skip     int64
+	Limit    int64
 }
