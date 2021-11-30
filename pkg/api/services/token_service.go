@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/o1egl/paseto"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/auth"
 	"github.com/yaien/clothes-store-api/pkg/core"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type TokenService interface {
@@ -37,7 +37,7 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 		return nil, errors.New("INVALID_CLIENT_CREDENTIALS")
 	}
 
-	user, err := s.Users.FindOne(bson.M{"email": login.Username})
+	user, err := s.Users.FindOneByEmail(context.TODO(), login.Username)
 	if err != nil {
 		return nil, fmt.Errorf("failed finding user: %w", err)
 	}
@@ -49,7 +49,7 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 		Audience:   login.ClientID,
 		Expiration: time.Now().Add(s.Config.Duration),
 		IssuedAt:   time.Now(),
-		Jti:        user.ID.Hex(),
+		Jti:        user.ID,
 	}
 
 	v2 := paseto.V2{}

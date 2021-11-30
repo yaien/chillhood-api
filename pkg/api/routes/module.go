@@ -5,6 +5,7 @@ import (
 	"github.com/yaien/clothes-store-api/pkg/api/middlewares"
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 	"github.com/yaien/clothes-store-api/pkg/core"
+	"github.com/yaien/clothes-store-api/pkg/interface/repository"
 )
 
 type service struct {
@@ -35,10 +36,10 @@ func bundle(app *core.App) *module {
 	email := services.NewEmailService(app.Config.SMTP, app.Templates)
 	cities := services.NewCityService(app.DB)
 	provinces := services.NewProvinceService(app.DB)
-	items := services.NewItemService(app.DB)
-	users := services.NewUserService(app.DB)
+	items := services.NewItemService(repository.NewMongoItemRepository(app.DB))
+	users := services.NewUserService(repository.NewMongoUserRepository(app.DB))
 	carts := services.NewCartService(items)
-	guests := services.NewGuestService(app.DB)
+	guests := services.NewGuestService(repository.NewMongoGuestRepository(app.DB))
 	invoices := services.NewInvoiceService(app.DB)
 	slack := services.NewSlackService(app.Slack, app.Config.Slack)
 	epayco := services.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL, invoices, carts, guests, slack, email)

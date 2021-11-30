@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
@@ -80,7 +81,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error
 					return nil, err
 				}
 			}
-			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
+			if err := e.guests.Reset(context.TODO(), invoice.GuestID); err != nil {
 				return nil, err
 			}
 			e.slack.NotifySale(invoice)
@@ -92,7 +93,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error
 					return nil, err
 				}
 			}
-			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
+			if err := e.guests.Reset(context.TODO(), invoice.GuestID); err != nil {
 				return nil, err
 			}
 		default:

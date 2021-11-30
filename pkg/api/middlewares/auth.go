@@ -6,8 +6,6 @@ import (
 
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 	"github.com/yaien/clothes-store-api/pkg/core"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/net/context"
 )
 
@@ -25,12 +23,8 @@ func (g *JWTGuard) ServeHTTP(w http.ResponseWriter, r *http.Request, next http.H
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	id, err := primitive.ObjectIDFromHex(claims.Jti)
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	user, err := g.Users.FindOne(bson.M{"_id": id})
+
+	user, err := g.Users.FindOneByID(r.Context(), claims.Jti)
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)

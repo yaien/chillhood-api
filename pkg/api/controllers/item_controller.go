@@ -6,10 +6,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
-	"go.mongodb.org/mongo-driver/bson"
-
 	"github.com/gorilla/mux"
+	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 )
@@ -26,7 +24,7 @@ func (p *ItemController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = p.Items.Create(&item)
+	err = p.Items.Create(r.Context(), &item)
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)
 		return
@@ -35,7 +33,7 @@ func (p *ItemController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *ItemController) Find(w http.ResponseWriter, r *http.Request) {
-	items, err := p.Items.Find(bson.M{})
+	items, err := p.Items.Find(r.Context())
 	if err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
@@ -44,7 +42,7 @@ func (p *ItemController) Find(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *ItemController) FindActive(w http.ResponseWriter, r *http.Request) {
-	items, err := p.Items.Find(bson.M{"active": true})
+	items, err := p.Items.FindActive(r.Context())
 	if err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
@@ -54,7 +52,7 @@ func (p *ItemController) FindActive(w http.ResponseWriter, r *http.Request) {
 
 func (p *ItemController) Slug(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["item_slug"]
-	item, err := p.Items.FindOne(bson.M{"slug": slug})
+	item, err := p.Items.FindOneBySlug(r.Context(), slug)
 	if err != nil {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
 		return
@@ -64,7 +62,7 @@ func (p *ItemController) Slug(w http.ResponseWriter, r *http.Request) {
 
 func (p *ItemController) Param(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	id := mux.Vars(r)["item_id"]
-	item, err := p.Items.Get(id)
+	item, err := p.Items.FindOneByID(r.Context(), id)
 	if err != nil {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
 		return
@@ -87,7 +85,7 @@ func (p *ItemController) Update(w http.ResponseWriter, r *http.Request) {
 
 	item := r.Context().Value(key("item")).(*models.Item)
 	data.ID = item.ID
-	if err := p.Items.Update(&data); err != nil {
+	if err := p.Items.Update(r.Context(), &data); err != nil {
 		response.Error(w, err, http.StatusBadRequest)
 		return
 	}

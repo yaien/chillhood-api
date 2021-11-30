@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -9,11 +10,12 @@ import (
 func TestCartAdd(t *testing.T) {
 	cart := &Cart{}
 	cartItem := &CartItem{
-		ID:       primitive.NewObjectID(),
+		ID:       primitive.NewObjectID().Hex(),
 		Price:    1000,
 		Quantity: 2,
 	}
-	cart.AddItem(cartItem)
+	err := cart.AddItem(cartItem)
+	require.NoError(t, err)
 
 	if len(cart.Items) != 1 {
 		t.Errorf("expected cart items length to be 1, received %d", len(cart.Items))
@@ -37,8 +39,8 @@ func TestCartRefresh(t *testing.T) {
 			cart: &Cart{
 				Shipping: 200,
 				Items: []*CartItem{
-					{ID: primitive.NewObjectID(), Price: 1000, Quantity: 2},
-					{ID: primitive.NewObjectID(), Price: 500, Quantity: 2},
+					{ID: primitive.NewObjectID().Hex(), Price: 1000, Quantity: 2},
+					{ID: primitive.NewObjectID().Hex(), Price: 500, Quantity: 2},
 				},
 			},
 			total: 3200,
@@ -46,8 +48,8 @@ func TestCartRefresh(t *testing.T) {
 			cart: &Cart{
 				Shipping: 100,
 				Items: []*CartItem{
-					{ID: primitive.NewObjectID(), Price: 200, Quantity: 3},
-					{ID: primitive.NewObjectID(), Price: 800, Quantity: 2},
+					{ID: primitive.NewObjectID().Hex(), Price: 200, Quantity: 3},
+					{ID: primitive.NewObjectID().Hex(), Price: 800, Quantity: 2},
 				},
 			},
 			total: 2300,
@@ -62,7 +64,7 @@ func TestCartRefresh(t *testing.T) {
 }
 
 func TestCartRemove(t *testing.T) {
-	id := primitive.NewObjectID()
+	id := primitive.NewObjectID().Hex()
 	cartItem := &CartItem{
 		ID:       id,
 		Price:    2000,
@@ -87,14 +89,14 @@ func TestCartRemove(t *testing.T) {
 }
 
 func TestHasItem(t *testing.T) {
-	id := primitive.NewObjectID()
+	id := primitive.NewObjectID().Hex()
 	cart := &Cart{
 		Items: []*CartItem{{ID: id}},
 	}
 	if !cart.HasItem(id) {
 		t.Error("expect cart.HasItem to return true on existen item")
 	}
-	if cart.HasItem(primitive.NewObjectID()) {
+	if cart.HasItem(primitive.NewObjectID().Hex()) {
 		t.Error("expected cart.HasItem to return false on unexistent item")
 	}
 }

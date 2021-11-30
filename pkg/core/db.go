@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// connect to mongo database
+// connect to repository database
 func connect(rawurl string) (*mongo.Database, error) {
 	uri, err := url.Parse(rawurl)
 	if err != nil {

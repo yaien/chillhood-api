@@ -1,12 +1,11 @@
 package services
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/input"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CartService interface {
@@ -21,7 +20,7 @@ type cartService struct {
 
 func (c *cartService) Execute(cart *models.Cart) error {
 	for _, cartItem := range cart.Items {
-		err := c.Items.Decrement(cartItem.ID.Hex(), cartItem.Size, cartItem.Quantity)
+		err := c.Items.Decrement(context.TODO(), cartItem.ID, cartItem.Size, cartItem.Quantity)
 		if err != nil {
 			return err
 		}
@@ -32,7 +31,7 @@ func (c *cartService) Execute(cart *models.Cart) error {
 
 func (c *cartService) Revert(cart *models.Cart) error {
 	for _, cartItem := range cart.Items {
-		err := c.Items.Increment(cartItem.ID.Hex(), cartItem.Size, cartItem.Quantity)
+		err := c.Items.Increment(context.TODO(), cartItem.ID, cartItem.Size, cartItem.Quantity)
 		if err != nil {
 			return err
 		}
@@ -44,13 +43,9 @@ func (c *cartService) Revert(cart *models.Cart) error {
 func (c *cartService) New(requests []*input.Item) (*models.Cart, error) {
 	cart := &models.Cart{}
 	for _, request := range requests {
-		id, err := primitive.ObjectIDFromHex(request.ID)
+		item, err := c.Items.FindOneActiveByID(context.TODO(), request.ID)
 		if err != nil {
-			return nil, fmt.Errorf("INVALID_ITEM_ID: %s isn't a a valid object id: %w", request.ID, err)
-		}
-		item, err := c.Items.FindOne(bson.M{"_id": id, "active": true})
-		if err != nil {
-			return nil, fmt.Errorf("ITEM_NOT_FOUND: item %s doesn't exist or is inactive: %w", id, err)
+			return nil, fmt.Errorf("ITEM_NOT_FOUND: item %s doesn't exist or is inactive: %w", request.ID, err)
 		}
 		size, err := item.Size(request.Size)
 		if err != nil {
@@ -58,7 +53,7 @@ func (c *cartService) New(requests []*input.Item) (*models.Cart, error) {
 		}
 		if request.Quantity > size.Existence {
 			return nil, fmt.Errorf("SOLD_OUT: there is only %d %s (id: %s, size: %s) items, requested %d",
-				size.Existence, item.Name, id, size.Label, request.Quantity)
+				size.Existence, item.Name, request.ID, size.Label, request.Quantity)
 		}
 
 		var picture *models.Picture

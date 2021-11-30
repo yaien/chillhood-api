@@ -5,8 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"github.com/gorilla/mux"
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
@@ -32,7 +30,7 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, err := c.Items.Get(data.ID)
+	product, err := c.Items.FindOneByID(r.Context(), data.ID)
 
 	if err != nil {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusBadRequest)
@@ -78,7 +76,7 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 		response.Error(w, errors.New("PRODUCT_ALREADY_ADDED"), http.StatusBadRequest)
 		return
 	}
-	if err = c.Guests.Update(guest); err != nil {
+	if err = c.Guests.Update(r.Context(), guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -87,16 +85,12 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 
 func (c *CartController) Remove(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value("guest").(*models.Guest)
-	itemID, err := primitive.ObjectIDFromHex(mux.Vars(r)["item_id"])
-	if err != nil {
-		response.Error(w, errors.New("INVALID_ITEM_ID"), http.StatusNotFound)
-		return
-	}
+	itemID := mux.Vars(r)["item_id"]
 	if !guest.Cart.RemoveItem(itemID) {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
 		return
 	}
-	if err := c.Guests.Update(guest); err != nil {
+	if err := c.Guests.Update(r.Context(), guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}

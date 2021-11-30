@@ -27,7 +27,7 @@ type invoiceService struct {
 }
 
 func (s *invoiceService) Create(invoice *models.Invoice) error {
-	invoice.ID = primitive.NewObjectID()
+	invoice.ID = primitive.NewObjectID().Hex()
 	invoice.Ref = strings.ToUpper(shortid.MustGenerate())
 	invoice.CreatedAt = time.Now()
 	invoice.UpdatedAt = time.Now()
