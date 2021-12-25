@@ -23,7 +23,7 @@ func Send(w http.ResponseWriter, data interface{}) {
 func Error(w http.ResponseWriter, err error, status int) {
 	var e *models.Error
 	if errors.As(err, &e) {
-		JSON(w, map[string]string{"error": e.Code}, status)
+		JSON(w, map[string]string{"error": e.Code, "desc": e.Error()}, status)
 		return
 	}
 
