@@ -16,7 +16,7 @@ func (pc *ProvinceController) Search(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	limit, _ := strconv.Atoi(query.Get("limit"))
 	skip, _ := strconv.Atoi(query.Get("skip"))
-	provinces, err := pc.Provinces.Search(services.SearchProvinceOptions{
+	provinces, err := pc.Provinces.Search(r.Context(), models.SearchProvinceOptions{
 		Name:  query.Get("name"),
 		Limit: int64(limit),
 		Skip:  int64(skip),

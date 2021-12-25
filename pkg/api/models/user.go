@@ -1,20 +1,23 @@
 package models
 
 import (
+	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
+type ID = primitive.ObjectID
+
 type User struct {
-	ID        primitive.ObjectID `bson:"_id" json:"id"`
-	Name      string             `json:"name"`
-	Email     string             `json:"email"`
-	Password  string             `json:"-"`
-	Role      string             `json:"role"`
-	CreatedAt time.Time          `json:"createdAt"`
-	UpdatedAt time.Time          `json:"updatedAt"`
+	ID        ID        `bson:"_id" json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"-"`
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (u *User) HashPassword() error {
@@ -28,4 +31,10 @@ func (u *User) HashPassword() error {
 
 func (u *User) VerifyPassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+}
+
+type UserRepository interface {
+	FindOneByID(ctx context.Context, id ID) (*User, error)
+	FindOneByEmail(ctx context.Context, email string) (*User, error)
+	Create(ctx context.Context, u *User) error
 }

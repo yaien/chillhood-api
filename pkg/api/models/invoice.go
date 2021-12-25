@@ -1,22 +1,22 @@
 package models
 
 import (
+	"context"
 	"time"
 
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/epayco"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Invoice struct {
-	ID        primitive.ObjectID `bson:"_id" json:"id"`
-	Ref       string             `json:"ref"`
-	Cart      *Cart              `json:"cart"`
-	Shipping  *Shipping          `json:"shipping"`
-	Status    InvoiceStatus      `json:"status"`
-	CreatedAt time.Time          `json:"createdAt"`
-	UpdatedAt time.Time          `json:"updatedAt"`
-	Payment   *epayco.Payment    `json:"-"`
-	GuestID   primitive.ObjectID `json:"guestId"`
+	ID        ID              `bson:"_id" json:"id"`
+	Ref       string          `json:"ref"`
+	Cart      *Cart           `json:"cart"`
+	Shipping  *Shipping       `json:"shipping"`
+	Status    InvoiceStatus   `json:"status"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+	Payment   *epayco.Payment `json:"-"`
+	GuestID   ID              `json:"guestId"`
 }
 
 type InvoiceStatus string
@@ -28,3 +28,16 @@ const (
 	Pending   InvoiceStatus = "pending"
 	Completed InvoiceStatus = "completed"
 )
+
+type InvoiceRepository interface {
+	Create(ctx context.Context, invoice *Invoice) error
+	FindOneByID(ctx context.Context, id ID) (*Invoice, error)
+	FindOneByRef(ctx context.Context, ref string) (*Invoice, error)
+	Search(ctx context.Context, opts SearchInvoiceOptions) ([]*Invoice, error)
+	Update(ctx context.Context, invoice *Invoice) error
+}
+
+type SearchInvoiceOptions struct {
+	Query  string
+	Status InvoiceStatus
+}

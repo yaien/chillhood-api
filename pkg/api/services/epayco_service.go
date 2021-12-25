@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
@@ -64,7 +65,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error
 		return nil, errors.New("INVALID_SIGNATURE")
 	}
 
-	invoice, err := e.invoices.GetByRef(payment.Invoice)
+	invoice, err := e.invoices.FindOneByRef(context.TODO(), payment.Invoice)
 
 	if err != nil {
 		return nil, fmt.Errorf("INVOICE_NOT_FOUND: %s", err.Error())
@@ -80,7 +81,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error
 					return nil, err
 				}
 			}
-			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
+			if err := e.guests.Reset(context.TODO(), invoice.GuestID); err != nil {
 				return nil, err
 			}
 			e.slack.NotifySale(invoice)
@@ -92,7 +93,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error
 					return nil, err
 				}
 			}
-			if err := e.guests.Reset(invoice.GuestID.Hex()); err != nil {
+			if err := e.guests.Reset(context.TODO(), invoice.GuestID); err != nil {
 				return nil, err
 			}
 		default:
@@ -104,7 +105,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*models.Invoice, error
 	}
 
 	invoice.Payment = payment
-	if err := e.invoices.Update(invoice); err != nil {
+	if err := e.invoices.Update(context.TODO(), invoice); err != nil {
 		return nil, err
 	}
 

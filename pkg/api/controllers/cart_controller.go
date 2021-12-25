@@ -3,9 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
@@ -13,26 +12,24 @@ import (
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 )
 
-type ItemPayload struct {
-	ID       string `json:"id"`
-	Size     string `json:"size"`
-	Quantity int    `json:"quantity"`
-}
-
 type CartController struct {
 	Guests services.GuestService
 	Items  services.ItemService
 }
 
 func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
-	var data ItemPayload
+	var data struct {
+		ID       models.ID `json:"id"`
+		Size     string    `json:"size"`
+		Quantity int       `json:"quantity"`
+	}
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)
 		return
 	}
 
-	product, err := c.Items.Get(data.ID)
+	product, err := c.Items.FindOneByID(r.Context(), data.ID)
 
 	if err != nil {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusBadRequest)
@@ -78,7 +75,7 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 		response.Error(w, errors.New("PRODUCT_ALREADY_ADDED"), http.StatusBadRequest)
 		return
 	}
-	if err = c.Guests.Update(guest); err != nil {
+	if err = c.Guests.Update(r.Context(), guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -92,11 +89,12 @@ func (c *CartController) Remove(w http.ResponseWriter, r *http.Request) {
 		response.Error(w, errors.New("INVALID_ITEM_ID"), http.StatusNotFound)
 		return
 	}
+
 	if !guest.Cart.RemoveItem(itemID) {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
 		return
 	}
-	if err := c.Guests.Update(guest); err != nil {
+	if err := c.Guests.Update(r.Context(), guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}

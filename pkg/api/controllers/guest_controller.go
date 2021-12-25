@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -16,9 +17,9 @@ type GuestController struct {
 	Guests services.GuestService
 }
 
-func (c *GuestController) Create(w http.ResponseWriter, _ *http.Request) {
+func (c *GuestController) Create(w http.ResponseWriter, r *http.Request) {
 	guest := &models.Guest{}
-	if err := c.Guests.Create(guest); err != nil {
+	if err := c.Guests.Create(r.Context(), guest); err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -26,8 +27,12 @@ func (c *GuestController) Create(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *GuestController) Param(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	id := mux.Vars(r)["guest_id"]
-	guest, err := c.Guests.Get(id)
+	id, err := primitive.ObjectIDFromHex(mux.Vars(r)["guest_id"])
+	if err != nil {
+		response.Error(w, &models.Error{Code: "INVALID_GUEST_ID", Err: err}, http.StatusBadRequest)
+		return
+	}
+	guest, err := c.Guests.Get(r.Context(), id)
 	if err != nil {
 		response.Error(w, errors.New("GUEST_NOT_FOUND"), http.StatusNotFound)
 		return

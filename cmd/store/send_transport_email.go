@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 	"github.com/yaien/clothes-store-api/pkg/core"
+	"github.com/yaien/clothes-store-api/pkg/interface/repository"
 )
 
 func sendTransportEmail() *cobra.Command {
@@ -19,9 +21,9 @@ func sendTransportEmail() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			invoices := services.NewInvoiceService(app.DB)
+			invoices := services.NewInvoiceService(repository.NewMongoInvoiceRepository(app.DB))
 			emails := services.NewEmailService(app.Config.SMTP, app.Templates)
-			invoice, err := invoices.GetByRef(args[0])
+			invoice, err := invoices.FindOneByRef(context.TODO(), args[0])
 			if err != nil {
 				return fmt.Errorf("failed finding invoice: %w", err)
 			}

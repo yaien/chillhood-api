@@ -1,10 +1,9 @@
 package models
 
 import (
+	"context"
 	"errors"
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Size struct {
@@ -15,18 +14,22 @@ type Size struct {
 	Sleeve    int    `json:"sleeve"`
 }
 
+type Picture struct {
+	Reference string `json:"reference"`
+}
+
 type Item struct {
-	ID          primitive.ObjectID `bson:"_id" json:"id"`
-	Name        string             `json:"name"`
-	Slug        string             `json:"slug"`
-	Price       int                `json:"price"`
-	Active      bool               `json:"active"`
-	Tags        []string           `json:"tags"`
-	Pictures    []*Picture         `json:"pictures"`
-	Description string             `json:"description"`
-	CreatedAt   time.Time          `json:"createdAt"`
-	UpdatedAt   time.Time          `json:"updatedAt"`
-	Sizes       []*Size            `json:"sizes"`
+	ID          ID         `bson:"_id" json:"id"`
+	Name        string     `json:"name"`
+	Slug        string     `json:"slug"`
+	Price       int        `json:"price"`
+	Active      bool       `json:"active"`
+	Tags        []string   `json:"tags"`
+	Pictures    []*Picture `json:"pictures"`
+	Description string     `json:"description"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
+	Sizes       []*Size    `json:"sizes"`
 }
 
 func (p *Item) Size(label string) (*Size, error) {
@@ -39,4 +42,15 @@ func (p *Item) Size(label string) (*Size, error) {
 		}
 	}
 	return nil, errors.New("size not found")
+}
+
+type ItemRepository interface {
+	Create(ctx context.Context, item *Item) error
+	CountByName(ctx context.Context, name string) (int64, error)
+	FindOneByID(ctx context.Context, id ID) (*Item, error)
+	FindOneActiveByID(ctx context.Context, id ID) (*Item, error)
+	FindOneBySlug(ctx context.Context, slug string) (*Item, error)
+	Find(ctx context.Context) ([]*Item, error)
+	FindActive(ctx context.Context) ([]*Item, error)
+	Update(ctx context.Context, item *Item) error
 }

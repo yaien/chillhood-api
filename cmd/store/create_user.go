@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/yaien/clothes-store-api/pkg/interface/repository"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -24,7 +26,7 @@ func createUser() *cobra.Command {
 			if err != nil {
 				log.Fatal(err)
 			}
-			service := services.NewUserService(app.DB)
+			service := services.NewUserService(repository.NewMongoUserRepository(app.DB))
 			user := models.User{
 				Role:     "admin",
 				Password: password,
@@ -32,7 +34,7 @@ func createUser() *cobra.Command {
 				Name:     name,
 			}
 			user.HashPassword()
-			if err := service.Create(&user); err != nil {
+			if err := service.Create(context.TODO(), &user); err != nil {
 				log.Fatal(err)
 			}
 			bytes, _ := json.MarshalIndent(&user, "", "    ")

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,7 +14,8 @@ func TestCartAdd(t *testing.T) {
 		Price:    1000,
 		Quantity: 2,
 	}
-	cart.AddItem(cartItem)
+	err := cart.AddItem(cartItem)
+	require.NoError(t, err)
 
 	if len(cart.Items) != 1 {
 		t.Errorf("expected cart items length to be 1, received %d", len(cart.Items))

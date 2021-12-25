@@ -16,7 +16,7 @@ func (cc *CityController) Search(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	limit, _ := strconv.Atoi(query.Get("limit"))
 	skip, _ := strconv.Atoi(query.Get("skip"))
-	cities, err := cc.Cities.Search(services.SearchCityOptions{
+	cities, err := cc.Cities.Search(r.Context(), models.SearchCityOptions{
 		Name:     query.Get("name"),
 		Province: query.Get("province"),
 		Limit:    int64(limit),
@@ -25,9 +25,6 @@ func (cc *CityController) Search(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		response.Error(w, err, http.StatusInternalServerError)
 		return
-	}
-	if cities == nil {
-		cities = make([]*models.City, 0)
 	}
 	response.Send(w, cities)
 }

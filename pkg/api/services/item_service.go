@@ -8,82 +8,63 @@ import (
 
 	"github.com/gosimple/slug"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ItemService interface {
-	Create(product *models.Item) error
-	Get(id string) (*models.Item, error)
-	Update(product *models.Item) error
-	Find(filter interface{}) ([]*models.Item, error)
-	FindOne(filter interface{}) (*models.Item, error)
-	Decrement(id string, size string, quantity int) error
-	Increment(id string, size string, quantity int) error
+	Create(ctx context.Context, item *models.Item) error
+	FindOneByID(ctx context.Context, id models.ID) (*models.Item, error)
+	FindOneActiveByID(ctx context.Context, id models.ID) (*models.Item, error)
+	FindOneBySlug(ctx context.Context, slug string) (*models.Item, error)
+	Update(ctx context.Context, item *models.Item) error
+	Find(ctx context.Context) ([]*models.Item, error)
+	FindActive(ctx context.Context) ([]*models.Item, error)
+	Decrement(ctx context.Context, id models.ID, size string, quantity int) error
+	Increment(ctx context.Context, id models.ID, size string, quantity int) error
 }
 
 type itemService struct {
-	collection *mongo.Collection
+	items models.ItemRepository
 }
 
-func (p *itemService) Create(item *models.Item) error {
-	item.ID = primitive.NewObjectID()
+func (p *itemService) Create(ctx context.Context, item *models.Item) error {
 	item.CreatedAt = time.Now()
+	item.UpdatedAt = time.Now()
 	item.Slug = slug.Make(item.Name)
-
-	count, err := p.collection.CountDocuments(context.TODO(), bson.M{"name": item.Name})
+	count, err := p.items.CountByName(ctx, item.Name)
 	if err != nil {
 		return err
 	}
 	if count > 0 {
 		return fmt.Errorf("ItemExists: there is already a item with name %s", item.Name)
 	}
-
-	_, err = p.collection.InsertOne(context.TODO(), item)
-	return err
+	return p.items.Create(ctx, item)
 }
 
-func (p *itemService) Get(id string) (*models.Item, error) {
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	filter := bson.M{"_id": _id}
-	return p.FindOne(filter)
+func (p *itemService) FindOneByID(ctx context.Context, id models.ID) (*models.Item, error) {
+	return p.items.FindOneByID(ctx, id)
 }
 
-func (p *itemService) FindOne(filter interface{}) (*models.Item, error) {
-	var item models.Item
-	err := p.collection.FindOne(context.TODO(), filter).Decode(&item)
-	return &item, err
+func (p *itemService) FindOneActiveByID(ctx context.Context, id models.ID) (*models.Item, error) {
+	return p.items.FindOneActiveByID(ctx, id)
 }
 
-func (p *itemService) Find(filter interface{}) ([]*models.Item, error) {
-	items := []*models.Item{}
-	cursor, err := p.collection.Find(context.TODO(), filter)
-	if err != nil {
-		return nil, err
-	}
-	for cursor.Next(context.TODO()) {
-		var product models.Item
-		err := cursor.Decode(&product)
-		if err != nil {
-			return nil, err
-		}
-		items = append(items, &product)
-	}
-	return items, nil
+func (p *itemService) FindOneBySlug(ctx context.Context, slug string) (*models.Item, error) {
+	return p.items.FindOneBySlug(ctx, slug)
 }
 
-func (p *itemService) Update(item *models.Item) error {
+func (p *itemService) Find(ctx context.Context) ([]*models.Item, error) {
+	return p.items.Find(ctx)
+}
+
+func (p *itemService) FindActive(ctx context.Context) ([]*models.Item, error) {
+	return p.items.FindActive(ctx)
+}
+
+func (p *itemService) Update(ctx context.Context, item *models.Item) error {
 	item.Slug = slug.Make(item.Name)
 	item.UpdatedAt = time.Now()
 
-	count, err := p.collection.CountDocuments(context.TODO(), bson.M{
-		"_id":  bson.M{"$ne": item.ID},
-		"name": item.Name,
-	})
+	count, err := p.items.CountByName(ctx, item.Name)
 	if err != nil {
 		return err
 	}
@@ -91,14 +72,11 @@ func (p *itemService) Update(item *models.Item) error {
 		return fmt.Errorf("ItemExists: there is already a item with name %s", item.Name)
 	}
 
-	filter := bson.M{"_id": item.ID}
-	update := bson.M{"$set": item}
-	_, err = p.collection.UpdateOne(context.TODO(), filter, update)
-	return err
+	return p.items.Update(ctx, item)
 }
 
-func (p *itemService) Decrement(id string, size string, quantity int) error {
-	item, err := p.Get(id)
+func (p *itemService) Decrement(ctx context.Context, id models.ID, size string, quantity int) error {
+	item, err := p.FindOneByID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -111,11 +89,11 @@ func (p *itemService) Decrement(id string, size string, quantity int) error {
 	}
 
 	sz.Existence -= quantity
-	return p.Update(item)
+	return p.Update(ctx, item)
 }
 
-func (p *itemService) Increment(id string, size string, quantity int) error {
-	item, err := p.Get(id)
+func (p *itemService) Increment(ctx context.Context, id models.ID, size string, quantity int) error {
+	item, err := p.FindOneByID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -125,9 +103,9 @@ func (p *itemService) Increment(id string, size string, quantity int) error {
 	}
 
 	sz.Existence += quantity
-	return p.Update(item)
+	return p.Update(ctx, item)
 }
 
-func NewItemService(db *mongo.Database) ItemService {
-	return &itemService{db.Collection("items")}
+func NewItemService(items models.ItemRepository) ItemService {
+	return &itemService{items}
 }

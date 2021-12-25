@@ -2,8 +2,6 @@ package models
 
 import (
 	"fmt"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Cart -> Shopping cart of the client
@@ -25,10 +23,9 @@ func (c *Cart) Refresh() {
 }
 
 // HasItem -> return true if the card has an item with current productID
-func (c *Cart) HasItem(id primitive.ObjectID) bool {
-	hex := id.Hex()
+func (c *Cart) HasItem(id ID) bool {
 	for _, item := range c.Items {
-		if item.ID.Hex() == hex {
+		if item.ID.Hex() == id.Hex() {
 			return true
 		}
 	}
@@ -38,7 +35,7 @@ func (c *Cart) HasItem(id primitive.ObjectID) bool {
 // AddItem -> add an item to the cart
 func (c *Cart) AddItem(item *CartItem) error {
 	if c.HasItem(item.ID) {
-		return fmt.Errorf("product '%s' is already added to the cart", item.ID.Hex())
+		return fmt.Errorf("product '%s' is already added to the cart", item.ID)
 	}
 	c.Items = append(c.Items, item)
 	c.Refresh()
@@ -46,7 +43,7 @@ func (c *Cart) AddItem(item *CartItem) error {
 }
 
 // RemoveItem -> remove an item of the cart
-func (c *Cart) RemoveItem(id primitive.ObjectID) bool {
+func (c *Cart) RemoveItem(id ID) bool {
 	length := len(c.Items)
 	for index, item := range c.Items {
 		if item.ID.Hex() == id.Hex() {
