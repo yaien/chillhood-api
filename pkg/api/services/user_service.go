@@ -8,7 +8,7 @@ import (
 )
 
 type UserService interface {
-	FindOneByID(ctx context.Context, id string) (*models.User, error)
+	FindOneByID(ctx context.Context, id models.ID) (*models.User, error)
 	FindOneByEmail(ctx context.Context, email string) (*models.User, error)
 	Create(ctx context.Context, user *models.User) error
 }
@@ -17,7 +17,7 @@ type userService struct {
 	repo models.UserRepository
 }
 
-func (s *userService) FindOneByID(ctx context.Context, id string) (*models.User, error) {
+func (s *userService) FindOneByID(ctx context.Context, id models.ID) (*models.User, error) {
 	return s.repo.FindOneByID(ctx, id)
 }
 

@@ -13,7 +13,7 @@ import (
 type InvoiceService interface {
 	Create(ctx context.Context, invoice *models.Invoice) error
 	Update(ctx context.Context, invoice *models.Invoice) error
-	FindOneByID(ctx context.Context, id string) (*models.Invoice, error)
+	FindOneByID(ctx context.Context, id models.ID) (*models.Invoice, error)
 	FindOneByRef(ctx context.Context, ref string) (*models.Invoice, error)
 	Search(ctx context.Context, opts models.SearchInvoiceOptions) ([]*models.Invoice, error)
 }
@@ -30,7 +30,7 @@ func (s *invoiceService) Create(ctx context.Context, invoice *models.Invoice) er
 	return s.invoices.Create(ctx, invoice)
 }
 
-func (s *invoiceService) FindOneByID(ctx context.Context, id string) (*models.Invoice, error) {
+func (s *invoiceService) FindOneByID(ctx context.Context, id models.ID) (*models.Invoice, error) {
 	return s.invoices.FindOneByID(ctx, id)
 }
 

@@ -12,14 +12,14 @@ import (
 
 type ItemService interface {
 	Create(ctx context.Context, item *models.Item) error
-	FindOneByID(ctx context.Context, id string) (*models.Item, error)
-	FindOneActiveByID(ctx context.Context, id string) (*models.Item, error)
+	FindOneByID(ctx context.Context, id models.ID) (*models.Item, error)
+	FindOneActiveByID(ctx context.Context, id models.ID) (*models.Item, error)
 	FindOneBySlug(ctx context.Context, slug string) (*models.Item, error)
 	Update(ctx context.Context, item *models.Item) error
 	Find(ctx context.Context) ([]*models.Item, error)
 	FindActive(ctx context.Context) ([]*models.Item, error)
-	Decrement(ctx context.Context, id, size string, quantity int) error
-	Increment(ctx context.Context, id, size string, quantity int) error
+	Decrement(ctx context.Context, id models.ID, size string, quantity int) error
+	Increment(ctx context.Context, id models.ID, size string, quantity int) error
 }
 
 type itemService struct {
@@ -28,6 +28,7 @@ type itemService struct {
 
 func (p *itemService) Create(ctx context.Context, item *models.Item) error {
 	item.CreatedAt = time.Now()
+	item.UpdatedAt = time.Now()
 	item.Slug = slug.Make(item.Name)
 	count, err := p.items.CountByName(ctx, item.Name)
 	if err != nil {
@@ -39,16 +40,16 @@ func (p *itemService) Create(ctx context.Context, item *models.Item) error {
 	return p.items.Create(ctx, item)
 }
 
-func (p *itemService) FindOneByID(ctx context.Context, id string) (*models.Item, error) {
+func (p *itemService) FindOneByID(ctx context.Context, id models.ID) (*models.Item, error) {
 	return p.items.FindOneByID(ctx, id)
 }
 
-func (p *itemService) FindOneActiveByID(ctx context.Context, id string) (*models.Item, error) {
+func (p *itemService) FindOneActiveByID(ctx context.Context, id models.ID) (*models.Item, error) {
 	return p.items.FindOneActiveByID(ctx, id)
 }
 
-func (p *itemService) FindOneBySlug(ctx context.Context, id string) (*models.Item, error) {
-	return p.items.FindOneBySlug(ctx, id)
+func (p *itemService) FindOneBySlug(ctx context.Context, slug string) (*models.Item, error) {
+	return p.items.FindOneBySlug(ctx, slug)
 }
 
 func (p *itemService) Find(ctx context.Context) ([]*models.Item, error) {
@@ -74,7 +75,7 @@ func (p *itemService) Update(ctx context.Context, item *models.Item) error {
 	return p.items.Update(ctx, item)
 }
 
-func (p *itemService) Decrement(ctx context.Context, id, size string, quantity int) error {
+func (p *itemService) Decrement(ctx context.Context, id models.ID, size string, quantity int) error {
 	item, err := p.FindOneByID(ctx, id)
 	if err != nil {
 		return err
@@ -91,7 +92,7 @@ func (p *itemService) Decrement(ctx context.Context, id, size string, quantity i
 	return p.Update(ctx, item)
 }
 
-func (p *itemService) Increment(ctx context.Context, id string, size string, quantity int) error {
+func (p *itemService) Increment(ctx context.Context, id models.ID, size string, quantity int) error {
 	item, err := p.FindOneByID(ctx, id)
 	if err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -61,7 +62,11 @@ func (p *ItemController) Slug(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *ItemController) Param(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	id := mux.Vars(r)["item_id"]
+	id, err := primitive.ObjectIDFromHex(mux.Vars(r)["item_id"])
+	if err != nil {
+		response.Error(w, &models.Error{Code: "INVALID_ITEM_ID", Err: err}, http.StatusBadRequest)
+		return
+	}
 	item, err := p.Items.FindOneByID(r.Context(), id)
 	if err != nil {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)

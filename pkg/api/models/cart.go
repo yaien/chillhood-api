@@ -23,9 +23,9 @@ func (c *Cart) Refresh() {
 }
 
 // HasItem -> return true if the card has an item with current productID
-func (c *Cart) HasItem(id string) bool {
+func (c *Cart) HasItem(id ID) bool {
 	for _, item := range c.Items {
-		if item.ID == id {
+		if item.ID.Hex() == id.Hex() {
 			return true
 		}
 	}
@@ -43,10 +43,10 @@ func (c *Cart) AddItem(item *CartItem) error {
 }
 
 // RemoveItem -> remove an item of the cart
-func (c *Cart) RemoveItem(id string) bool {
+func (c *Cart) RemoveItem(id ID) bool {
 	length := len(c.Items)
 	for index, item := range c.Items {
-		if item.ID == id {
+		if item.ID.Hex() == id.Hex() {
 			c.Items[index] = c.Items[length-1]
 			c.Items = c.Items[:length-1]
 			c.Refresh()

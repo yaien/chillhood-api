@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,19 +12,17 @@ import (
 	"github.com/yaien/clothes-store-api/pkg/api/services"
 )
 
-type ItemPayload struct {
-	ID       string `json:"id"`
-	Size     string `json:"size"`
-	Quantity int    `json:"quantity"`
-}
-
 type CartController struct {
 	Guests services.GuestService
 	Items  services.ItemService
 }
 
 func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
-	var data ItemPayload
+	var data struct {
+		ID       models.ID `json:"id"`
+		Size     string    `json:"size"`
+		Quantity int       `json:"quantity"`
+	}
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		response.Error(w, err, http.StatusBadRequest)
@@ -85,7 +84,12 @@ func (c *CartController) Add(w http.ResponseWriter, r *http.Request) {
 
 func (c *CartController) Remove(w http.ResponseWriter, r *http.Request) {
 	guest := r.Context().Value("guest").(*models.Guest)
-	itemID := mux.Vars(r)["item_id"]
+	itemID, err := primitive.ObjectIDFromHex(mux.Vars(r)["item_id"])
+	if err != nil {
+		response.Error(w, errors.New("INVALID_ITEM_ID"), http.StatusNotFound)
+		return
+	}
+
 	if !guest.Cart.RemoveItem(itemID) {
 		response.Error(w, errors.New("ITEM_NOT_FOUND"), http.StatusNotFound)
 		return

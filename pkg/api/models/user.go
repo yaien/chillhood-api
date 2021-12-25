@@ -2,13 +2,16 @@ package models
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
+type ID = primitive.ObjectID
+
 type User struct {
-	ID        string    `bson:"_id" json:"id"`
+	ID        ID        `bson:"_id" json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	Password  string    `json:"-"`
@@ -31,7 +34,7 @@ func (u *User) VerifyPassword(password string) error {
 }
 
 type UserRepository interface {
-	FindOneByID(ctx context.Context, id string) (*User, error)
+	FindOneByID(ctx context.Context, id ID) (*User, error)
 	FindOneByEmail(ctx context.Context, email string) (*User, error)
 	Create(ctx context.Context, u *User) error
 }

@@ -1,9 +1,11 @@
 package models
 
-import "context"
+import (
+	"context"
+)
 
 type Province struct {
-	ID   string `bson:"_id" json:"id"`
+	ID   ID     `bson:"_id" json:"id"`
 	Name string `json:"name"`
 }
 
@@ -20,7 +22,7 @@ type SearchProvinceOptions struct {
 }
 
 type City struct {
-	ID       string    `bson:"_id" json:"id"`
+	ID       ID        `bson:"_id" json:"id"`
 	Name     string    `json:"name"`
 	Shipment int       `json:"shipment"`
 	Days     int       `json:"days"`
@@ -36,7 +38,7 @@ type CityRepository interface {
 
 type FindOneCityOptions struct {
 	Name         string
-	ProvinceID   string
+	ProvinceID   ID
 	ProvinceName string
 }
 type SearchCityOptions struct {

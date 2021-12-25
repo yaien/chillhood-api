@@ -2,6 +2,8 @@ package response
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"net/http"
 )
 
@@ -19,5 +21,11 @@ func Send(w http.ResponseWriter, data interface{}) {
 
 // Error -> Send an error json response
 func Error(w http.ResponseWriter, err error, status int) {
+	var e *models.Error
+	if errors.As(err, &e) {
+		JSON(w, map[string]string{"error": e.Code}, status)
+		return
+	}
+
 	JSON(w, map[string]string{"error": err.Error()}, status)
 }

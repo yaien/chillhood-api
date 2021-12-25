@@ -15,23 +15,19 @@ type MongoInvoiceRepository struct {
 }
 
 func (m MongoInvoiceRepository) Create(ctx context.Context, invoice *models.Invoice) error {
-	invoice.ID = primitive.NewObjectID().Hex()
+	invoice.ID = primitive.NewObjectID()
 	_, err := m.collection.InsertOne(ctx, invoice)
 	return err
 }
 
-func (m MongoInvoiceRepository) FindOneByID(ctx context.Context, id string) (*models.Invoice, error) {
+func (m MongoInvoiceRepository) FindOneByID(ctx context.Context, id primitive.ObjectID) (*models.Invoice, error) {
 	var invoice models.Invoice
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	err = m.collection.FindOne(ctx, bson.M{"_id": oid}).Decode(&invoice)
+	err := m.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&invoice)
 	if err == nil {
 		return &invoice, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }
@@ -43,7 +39,7 @@ func (m MongoInvoiceRepository) FindOneByRef(ctx context.Context, ref string) (*
 		return &invoice, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }

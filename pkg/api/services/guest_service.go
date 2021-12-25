@@ -9,9 +9,9 @@ import (
 // GuestService for made crud operations on guest collection
 type GuestService interface {
 	Create(ctx context.Context, guest *models.Guest) error
-	Get(ctx context.Context, id string) (*models.Guest, error)
+	Get(ctx context.Context, id models.ID) (*models.Guest, error)
 	Update(ctx context.Context, guest *models.Guest) error
-	Reset(ctx context.Context, id string) error
+	Reset(ctx context.Context, id models.ID) error
 }
 
 type guestService struct {
@@ -26,11 +26,11 @@ func (s *guestService) Create(ctx context.Context, guest *models.Guest) error {
 	return nil
 }
 
-func (s *guestService) Get(ctx context.Context, id string) (*models.Guest, error) {
+func (s *guestService) Get(ctx context.Context, id models.ID) (*models.Guest, error) {
 	return s.repo.FindOneByID(ctx, id)
 }
 
-func (s *guestService) Reset(ctx context.Context, id string) error {
+func (s *guestService) Reset(ctx context.Context, id models.ID) error {
 	return s.repo.Reset(ctx, id)
 }
 

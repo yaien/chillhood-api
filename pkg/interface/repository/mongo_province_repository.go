@@ -54,13 +54,13 @@ func (p *MongoProvinceRepository) FindOneByName(ctx context.Context, name string
 		return &prov, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }
 
 func (p *MongoProvinceRepository) Create(ctx context.Context, pr *models.Province) error {
-	pr.ID = primitive.NewObjectID().Hex()
+	pr.ID = primitive.NewObjectID()
 	_, err := p.collection.InsertOne(ctx, pr)
 	return err
 }

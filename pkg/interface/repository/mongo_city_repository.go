@@ -49,7 +49,7 @@ func (m *MongoCityRepository) Search(ctx context.Context, opts models.SearchCity
 
 func (m *MongoCityRepository) FindOne(ctx context.Context, opts models.FindOneCityOptions) (*models.City, error) {
 	filter := bson.M{"name": opts.Name}
-	if opts.ProvinceID != "" {
+	if !opts.ProvinceID.IsZero() {
 		filter["province._id"] = opts.ProvinceID
 	}
 	if opts.ProvinceName != "" {
@@ -61,26 +61,19 @@ func (m *MongoCityRepository) FindOne(ctx context.Context, opts models.FindOneCi
 		return &city, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }
 
 func (m *MongoCityRepository) Create(ctx context.Context, city *models.City) error {
-	city.ID = primitive.NewObjectID().Hex()
+	city.ID = primitive.NewObjectID()
 	_, err := m.collection.InsertOne(ctx, city)
 	return err
 }
 
 func (m *MongoCityRepository) Update(ctx context.Context, city *models.City) error {
-	_, err := m.collection.UpdateOne(ctx, bson.M{"_id": city.ID}, bson.M{
-		"$set": bson.M{
-			"name":     city.Name,
-			"shipment": city.Shipment,
-			"days":     city.Days,
-			"province": city.Province,
-		},
-	})
+	_, err := m.collection.UpdateOne(ctx, bson.M{"_id": city.ID}, bson.M{"$set": city})
 	return err
 }
 

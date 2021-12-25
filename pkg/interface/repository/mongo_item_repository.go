@@ -14,7 +14,7 @@ type MongoItemRepository struct {
 }
 
 func (m *MongoItemRepository) Create(ctx context.Context, item *models.Item) error {
-	item.ID = primitive.NewObjectID().Hex()
+	item.ID = primitive.NewObjectID()
 	_, err := m.collection.InsertOne(ctx, item)
 	return err
 }
@@ -23,26 +23,26 @@ func (m *MongoItemRepository) CountByName(ctx context.Context, name string) (int
 	return m.collection.CountDocuments(ctx, bson.M{"name": name})
 }
 
-func (m *MongoItemRepository) FindOneByID(ctx context.Context, id string) (*models.Item, error) {
+func (m *MongoItemRepository) FindOneByID(ctx context.Context, id primitive.ObjectID) (*models.Item, error) {
 	var item models.Item
 	err := m.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&item)
 	if err == nil {
 		return &item, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }
 
-func (m *MongoItemRepository) FindOneActiveByID(ctx context.Context, id string) (*models.Item, error) {
+func (m *MongoItemRepository) FindOneActiveByID(ctx context.Context, id primitive.ObjectID) (*models.Item, error) {
 	var item models.Item
 	err := m.collection.FindOne(ctx, bson.M{"_id": id, "active": true}).Decode(&item)
 	if err == nil {
 		return &item, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }
@@ -54,7 +54,7 @@ func (m *MongoItemRepository) FindOneBySlug(ctx context.Context, slug string) (*
 		return &item, nil
 	}
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, &models.Error{Code: "not_found", Err: err}
+		return nil, &models.Error{Code: "NOT_FOUND", Err: err}
 	}
 	return nil, err
 }

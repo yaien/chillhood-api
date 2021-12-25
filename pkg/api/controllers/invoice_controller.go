@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
 
@@ -92,7 +93,11 @@ func (i *InvoiceController) GetByRef(w http.ResponseWriter, r *http.Request, nex
 }
 
 func (i *InvoiceController) Get(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	id := mux.Vars(r)["invoice_id"]
+	id, err := primitive.ObjectIDFromHex(mux.Vars(r)["invoice_id"])
+	if err != nil {
+		response.Error(w, &models.Error{Code: "INVALID_INVOICE_ID", Err: err}, http.StatusBadRequest)
+		return
+	}
 	invoice, err := i.Invoices.FindOneByID(r.Context(), id)
 	if err != nil {
 		response.Error(w, fmt.Errorf("INVOICE_NOT_FOUND: %s", err), http.StatusNotFound)

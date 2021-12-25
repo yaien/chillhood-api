@@ -14,8 +14,12 @@ type Size struct {
 	Sleeve    int    `json:"sleeve"`
 }
 
+type Picture struct {
+	Reference string `json:"reference"`
+}
+
 type Item struct {
-	ID          string     `bson:"_id" json:"id"`
+	ID          ID         `bson:"_id" json:"id"`
 	Name        string     `json:"name"`
 	Slug        string     `json:"slug"`
 	Price       int        `json:"price"`
@@ -43,8 +47,8 @@ func (p *Item) Size(label string) (*Size, error) {
 type ItemRepository interface {
 	Create(ctx context.Context, item *Item) error
 	CountByName(ctx context.Context, name string) (int64, error)
-	FindOneByID(ctx context.Context, id string) (*Item, error)
-	FindOneActiveByID(ctx context.Context, id string) (*Item, error)
+	FindOneByID(ctx context.Context, id ID) (*Item, error)
+	FindOneActiveByID(ctx context.Context, id ID) (*Item, error)
 	FindOneBySlug(ctx context.Context, slug string) (*Item, error)
 	Find(ctx context.Context) ([]*Item, error)
 	FindActive(ctx context.Context) ([]*Item, error)

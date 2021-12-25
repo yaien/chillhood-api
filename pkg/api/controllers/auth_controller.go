@@ -9,7 +9,6 @@ import (
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/response"
 	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"github.com/yaien/clothes-store-api/pkg/api/services"
-	"github.com/yaien/clothes-store-api/pkg/core"
 )
 
 type AuthController struct {
@@ -34,6 +33,6 @@ func (a *AuthController) Token(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *AuthController) User(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(core.Key("user")).(*models.User)
+	user := r.Context().Value("user").(*models.User)
 	response.Send(w, user)
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/o1egl/paseto"
+	"github.com/yaien/clothes-store-api/pkg/api/models"
 	"time"
 
 	"github.com/yaien/clothes-store-api/pkg/api/helpers/auth"
@@ -42,18 +43,18 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 		return nil, fmt.Errorf("failed finding user: %w", err)
 	}
 	if err := user.VerifyPassword(login.Password); err != nil {
-		return nil, fmt.Errorf("IVALID_PASSWORD: %w", err)
+		return nil, &models.Error{Code: "INVALID_PASSWORD", Err: err}
 	}
 
 	claims := paseto.JSONToken{
 		Audience:   login.ClientID,
 		Expiration: time.Now().Add(s.Config.Duration),
 		IssuedAt:   time.Now(),
-		Jti:        user.ID,
+		Jti:        user.ID.Hex(),
 	}
 
 	v2 := paseto.V2{}
-	token, err := v2.Encrypt(s.Config.Secret, claims, "")
+	token, err := v2.Encrypt(s.Config.Secret, claims, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed encrypt: %w", err)
 	}
@@ -70,7 +71,7 @@ func (s *tokenService) FromPassword(login *auth.Login) (*auth.Response, error) {
 func (s *tokenService) Decode(token string) (*paseto.JSONToken, error) {
 	var claims paseto.JSONToken
 	var v2 paseto.V2
-	err := v2.Decrypt(token, s.Config.Secret, &claims, "")
+	err := v2.Decrypt(token, s.Config.Secret, &claims, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 type Invoice struct {
-	ID        string          `bson:"_id" json:"id"`
+	ID        ID              `bson:"_id" json:"id"`
 	Ref       string          `json:"ref"`
 	Cart      *Cart           `json:"cart"`
 	Shipping  *Shipping       `json:"shipping"`
@@ -16,7 +16,7 @@ type Invoice struct {
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 	Payment   *epayco.Payment `json:"-"`
-	GuestID   string          `json:"guestId"`
+	GuestID   ID              `json:"guestId"`
 }
 
 type InvoiceStatus string
@@ -31,7 +31,7 @@ const (
 
 type InvoiceRepository interface {
 	Create(ctx context.Context, invoice *Invoice) error
-	FindOneByID(ctx context.Context, id string) (*Invoice, error)
+	FindOneByID(ctx context.Context, id ID) (*Invoice, error)
 	FindOneByRef(ctx context.Context, ref string) (*Invoice, error)
 	Search(ctx context.Context, opts SearchInvoiceOptions) ([]*Invoice, error)
 	Update(ctx context.Context, invoice *Invoice) error
