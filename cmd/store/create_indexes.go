@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/yaien/clothes-store-api/pkg/core"
+	"github.com/yaien/clothes-store-api/pkg/infrastructure"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,7 +18,7 @@ func createIndexes() *cobra.Command {
 		Use:   "db:index",
 		Short: "create database indexes",
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := core.NewApp()
+			app, err := infrastructure.NewApp()
 			if err != nil {
 				log.Fatal(err)
 			}

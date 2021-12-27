@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/yaien/clothes-store-api/pkg/interface/repository"
+	"github.com/yaien/clothes-store-api/pkg/entity"
+	"github.com/yaien/clothes-store-api/pkg/interface/mongodb"
+	"github.com/yaien/clothes-store-api/pkg/service"
 	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/yaien/clothes-store-api/pkg/api/models"
-	"github.com/yaien/clothes-store-api/pkg/api/services"
-	"github.com/yaien/clothes-store-api/pkg/core"
+	"github.com/yaien/clothes-store-api/pkg/infrastructure"
 )
 
 func createUser() *cobra.Command {
@@ -20,21 +20,21 @@ func createUser() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "users:create",
-		Short: "Create an user that can admin the cloth store api",
+		Short: "Create an user that can admin the cloth store rest",
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := core.NewApp()
+			app, err := infrastructure.NewApp()
 			if err != nil {
 				log.Fatal(err)
 			}
-			service := services.NewUserService(repository.NewMongoUserRepository(app.DB))
-			user := models.User{
+			srv := service.NewUserService(mongodb.NewUserRepository(app.DB))
+			user := entity.User{
 				Role:     "admin",
 				Password: password,
 				Email:    email,
 				Name:     name,
 			}
 			user.HashPassword()
-			if err := service.Create(context.TODO(), &user); err != nil {
+			if err := srv.Create(context.TODO(), &user); err != nil {
 				log.Fatal(err)
 			}
 			bytes, _ := json.MarshalIndent(&user, "", "    ")

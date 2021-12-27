@@ -10,7 +10,7 @@ import (
 func main() {
 	root := &cobra.Command{
 		Use:   "store",
-		Short: "cloth store api cli",
+		Short: "cloth store rest cli",
 	}
 	root.AddCommand(
 		createUser(),
