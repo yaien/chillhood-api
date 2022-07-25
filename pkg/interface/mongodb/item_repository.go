@@ -77,6 +77,9 @@ func (m *ItemRepository) Find(ctx context.Context) ([]*entity.Item, error) {
 		}
 		items = append(items, &item)
 	}
+	if items == nil {
+		items = []*entity.Item{}
+	}
 	return items, nil
 }
 
@@ -93,6 +96,9 @@ func (m *ItemRepository) FindActive(ctx context.Context) ([]*entity.Item, error)
 			return nil, err
 		}
 		items = append(items, &item)
+	}
+	if items == nil {
+		items = []*entity.Item{}
 	}
 	return items, nil
 }
