@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"github.com/yaien/clothes-store-api/pkg/infrastructure/migrations"
 	routes2 "github.com/yaien/clothes-store-api/pkg/interface/rest/routes"
 	"log"
 
@@ -19,6 +21,15 @@ func server() *cobra.Command {
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			go func() {
+				updater := migrations.NewUpdater(app.DB)
+				err := updater.Update(context.TODO())
+				if err != nil {
+					log.Panicln(err)
+				}
+			}()
+
 			server := negroni.Classic()
 			server.Use(cors.New(cors.Options{
 				AllowedOrigins: app.Config.Client.Origins,

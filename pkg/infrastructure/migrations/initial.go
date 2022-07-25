@@ -1,34 +1,17 @@
-package main
+package migrations
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/yaien/clothes-store-api/pkg/assets"
 	"github.com/yaien/clothes-store-api/pkg/entity"
-	"github.com/yaien/clothes-store-api/pkg/infrastructure"
 	"github.com/yaien/clothes-store-api/pkg/interface/mongodb"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/yaml.v2"
+	"time"
 )
-
-func populate() *cobra.Command {
-	return &cobra.Command{
-		Use:   "db:populate",
-		Short: "update initial seeder's data into db",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			app, err := infrastructure.NewApp()
-			if err != nil {
-				return err
-			}
-			if err := populateCities(app.DB); err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-}
 
 func populateCities(db *mongo.Database) error {
 	var cities []struct {
@@ -102,4 +85,50 @@ func populateCities(db *mongo.Database) error {
 		}
 	}
 	return nil
+}
+
+func populateUsers(db *mongo.Database) error {
+	users := []interface{}{
+		&entity.User{
+			Name:      "CODE",
+			Email:     "stevensonxmarquez@gmail.com",
+			Phone:     "+573163235111",
+			Password:  "nomelase",
+			ID:        primitive.NewObjectID(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		&entity.User{
+			Name:      "FEAR",
+			Email:     "felipechr14@gmail.com",
+			Phone:     "+573014700584",
+			Password:  "nomelase",
+			ID:        primitive.NewObjectID(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+	}
+
+	_, err := db.Collection("users").InsertMany(context.TODO(), users)
+	return err
+}
+
+func concat(fs ...func(db *mongo.Database) error) func(db *mongo.Database) error {
+	return func(db *mongo.Database) error {
+		for _, f := range fs {
+			err := f(db)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+var initial = concat(populateCities, populateUsers)
+
+var migrations []*Migration
+
+func register(mig *Migration) {
+	migrations = append(migrations, mig)
 }

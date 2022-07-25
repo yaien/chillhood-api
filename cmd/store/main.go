@@ -13,10 +13,8 @@ func main() {
 		Short: "cloth store rest cli",
 	}
 	root.AddCommand(
-		createUser(),
 		createIndexes(),
 		server(),
-		populate(),
 		sendSaleEmail(),
 		sendTransportEmail(),
 	)
