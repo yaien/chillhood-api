@@ -95,28 +95,32 @@ func populateCities(db *mongo.Database) error {
 }
 
 func populateUsers(db *mongo.Database) error {
-	users := []interface{}{
-		&entity.User{
-			Name:      "CODE",
-			Email:     "stevensonxmarquez@gmail.com",
-			Phone:     "+573163235111",
-			Password:  "nomelase",
-			ID:        primitive.NewObjectID(),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+	users := []*entity.User{
+		{
+			Name:     "CODE",
+			Email:    "stevensonxmarquez@gmail.com",
+			Phone:    "+573163235111",
+			Password: "nomelase",
 		},
-		&entity.User{
-			Name:      "FEAR",
-			Email:     "felipechr14@gmail.com",
-			Phone:     "+573014700584",
-			Password:  "nomelase",
-			ID:        primitive.NewObjectID(),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+		{
+			Name:     "FEAR",
+			Email:    "felipechr14@gmail.com",
+			Phone:    "+573014700584",
+			Password: "nomelase",
 		},
 	}
 
-	_, err := db.Collection("users").InsertMany(context.TODO(), users)
+	docs := make([]interface{}, len(users))
+	for i, user := range users {
+		user.ID = primitive.NewObjectID()
+		user.CreatedAt = time.Now()
+		user.UpdatedAt = time.Now()
+		user.Role = "admin"
+		_ = user.HashPassword()
+		docs[i] = user
+	}
+
+	_, err := db.Collection("users").InsertMany(context.TODO(), docs)
 	return err
 }
 
