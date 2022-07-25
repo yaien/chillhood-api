@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/yaien/clothes-store-api/assets"
+	"github.com/yaien/clothes-store-api/pkg/assets"
 	"github.com/yaien/clothes-store-api/pkg/entity"
 	"github.com/yaien/clothes-store-api/pkg/infrastructure"
 	"github.com/yaien/clothes-store-api/pkg/interface/mongodb"

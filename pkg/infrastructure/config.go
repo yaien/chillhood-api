@@ -95,7 +95,7 @@ func load() *Config {
 	godotenv.Load()
 	return &Config{
 		Production: os.Getenv("GO_ENV") == "production",
-		MongoURI:   os.Getenv("MONGODB_URI"),
+		MongoURI:   os.Getenv("MONGO_URL"),
 		Address:    address(),
 		BaseURL:    baseURL(os.Getenv("BASE_URL")),
 		Epayco: &EpaycoConfig{

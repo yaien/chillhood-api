@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"github.com/yaien/clothes-store-api/assets"
+	"github.com/yaien/clothes-store-api/pkg/assets"
 	"html/template"
 	"strings"
 )
