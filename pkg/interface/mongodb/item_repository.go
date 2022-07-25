@@ -23,6 +23,10 @@ func (m *ItemRepository) CountByName(ctx context.Context, name string) (int64, e
 	return m.collection.CountDocuments(ctx, bson.M{"name": name})
 }
 
+func (m *ItemRepository) CountByNameIgnore(ctx context.Context, id primitive.ObjectID, name string) (int64, error) {
+	return m.collection.CountDocuments(ctx, bson.M{"name": name, "id": bson.M{"$ne": id}})
+}
+
 func (m *ItemRepository) FindOneByID(ctx context.Context, id primitive.ObjectID) (*entity.Item, error) {
 	var item entity.Item
 	err := m.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&item)
@@ -73,6 +77,9 @@ func (m *ItemRepository) Find(ctx context.Context) ([]*entity.Item, error) {
 		}
 		items = append(items, &item)
 	}
+	if items == nil {
+		items = []*entity.Item{}
+	}
 	return items, nil
 }
 
@@ -89,6 +96,9 @@ func (m *ItemRepository) FindActive(ctx context.Context) ([]*entity.Item, error)
 			return nil, err
 		}
 		items = append(items, &item)
+	}
+	if items == nil {
+		items = []*entity.Item{}
 	}
 	return items, nil
 }
