@@ -14,9 +14,7 @@ import (
 )
 
 func createUser() *cobra.Command {
-	var name string
-	var email string
-	var password string
+	var name, email, password, phone string
 
 	cmd := &cobra.Command{
 		Use:   "users:create",
@@ -32,6 +30,7 @@ func createUser() *cobra.Command {
 				Password: password,
 				Email:    email,
 				Name:     name,
+				Phone:    phone,
 			}
 			user.HashPassword()
 			if err := srv.Create(context.TODO(), &user); err != nil {
@@ -46,9 +45,11 @@ func createUser() *cobra.Command {
 	flags.StringVar(&name, "name", "", "")
 	flags.StringVar(&email, "email", "", "")
 	flags.StringVar(&password, "password", "", "")
+	flags.StringVar(&phone, "phone", "", "--phone [+573163235123]")
 	cmd.MarkFlagRequired("name")
 	cmd.MarkFlagRequired("email")
 	cmd.MarkFlagRequired("password")
+	cmd.MarkFlagRequired("phone")
 
 	return cmd
 }
