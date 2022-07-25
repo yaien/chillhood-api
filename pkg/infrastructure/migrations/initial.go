@@ -36,54 +36,60 @@ func populateCities(db *mongo.Database) error {
 		if !ok {
 			repo := mongodb.NewProvinceRepository(db)
 			pr, err := repo.FindOneByName(context.TODO(), city.Province)
+			if err == nil {
+				provinces[city.Province] = *pr
+				province = *pr
+				continue
+			}
+
+			var ce *entity.Error
+			if !errors.As(err, &ce) || ce.Code != "NOT_FOUND" {
+				return fmt.Errorf("failed finding province: %w", err)
+			}
+
+			pr = &entity.Province{Name: city.Province}
+			err = repo.Create(context.TODO(), pr)
 			if err != nil {
-				var ce *entity.Error
-				if errors.As(err, &ce) && ce.Code == "NOT_FOUND" {
-					pr = &entity.Province{Name: city.Province}
-					err := repo.Create(context.TODO(), pr)
-					if err != nil {
-						return fmt.Errorf("failed creating province: %w", err)
-					}
-				} else {
-					return fmt.Errorf("failed finding province: %w", err)
-				}
+				return fmt.Errorf("failed creating province: %w", err)
 			}
 			provinces[city.Province] = *pr
 			province = *pr
 		}
 
 		repo := mongodb.NewCityRepository(db)
-		var created bool
-		city, err := repo.FindOne(context.TODO(), entity.FindOneCityOptions{
+		rc, err := repo.FindOne(context.TODO(), entity.FindOneCityOptions{
 			Name:       city.Name,
 			ProvinceID: province.ID,
 		})
-		if err != nil {
-			var me *entity.Error
-			if errors.As(err, &me) && me.Code == "NOT_FOUND" {
-				city = &entity.City{
-					Name:     city.Name,
-					Days:     city.Days,
-					Shipment: city.Shipment,
-					Province: &province,
-				}
-				err := repo.Create(context.TODO(), city)
-				if err != nil {
-					return fmt.Errorf("failed creating city: %w", err)
-				}
-				created = true
-			} else {
-				return fmt.Errorf("failed finding city: %w", err)
-			}
-		}
 
-		if created {
+		if err == nil {
+			rc.Days = city.Days
+			rc.Shipment = city.Shipment
+			rc.Province = &province
+			err = repo.Update(context.TODO(), rc)
+			if err != nil {
+				return fmt.Errorf("failed updating city: %w", err)
+			}
 			continue
 		}
-		err = repo.Update(context.TODO(), city)
-		if err != nil {
-			return fmt.Errorf("failed updating city: %w", err)
+
+		var me *entity.Error
+		if !errors.As(err, &me) || me.Code != "NOT_FOUND" {
+			return fmt.Errorf("failed finding city: %w", err)
 		}
+
+		rc = &entity.City{
+			Name:     city.Name,
+			Days:     city.Days,
+			Shipment: city.Shipment,
+			Province: &province,
+		}
+
+		err = repo.Create(context.TODO(), rc)
+		if err != nil {
+			return fmt.Errorf("failed creating city: %w", err)
+		}
+
 	}
 	return nil
 }
