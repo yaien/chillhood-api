@@ -25,8 +25,9 @@ func populateCities(db *mongo.Database) error {
 		return fmt.Errorf("failed reading seeder file: %w", err)
 	}
 
-	if err := yaml.Unmarshal(source, &cities); err != nil {
-		return err
+	err = yaml.Unmarshal(source, &cities)
+	if err != nil {
+		return fmt.Errorf("failed unmarshall cities.yaml")
 	}
 
 	provinces := make(map[string]entity.Province)
@@ -37,14 +38,14 @@ func populateCities(db *mongo.Database) error {
 			pr, err := repo.FindOneByName(context.TODO(), city.Province)
 			if err != nil {
 				var ce *entity.Error
-				if errors.As(err, &ce) && ce.Code == "not_found" {
+				if errors.As(err, &ce) && ce.Code == "NOT_FOUND" {
 					pr = &entity.Province{Name: city.Province}
 					err := repo.Create(context.TODO(), pr)
 					if err != nil {
 						return fmt.Errorf("failed creating province: %w", err)
 					}
 				} else {
-					return err
+					return fmt.Errorf("failed finding province: %w", err)
 				}
 			}
 			provinces[city.Province] = *pr
@@ -59,7 +60,7 @@ func populateCities(db *mongo.Database) error {
 		})
 		if err != nil {
 			var me *entity.Error
-			if errors.As(err, &me) && me.Code == "not_found" {
+			if errors.As(err, &me) && me.Code == "NOT_FOUND" {
 				city = &entity.City{
 					Name:     city.Name,
 					Days:     city.Days,
@@ -68,11 +69,11 @@ func populateCities(db *mongo.Database) error {
 				}
 				err := repo.Create(context.TODO(), city)
 				if err != nil {
-					return err
+					return fmt.Errorf("failed creating city: %w", err)
 				}
 				created = true
 			} else {
-				return err
+				return fmt.Errorf("failed finding city: %w", err)
 			}
 		}
 
@@ -81,7 +82,7 @@ func populateCities(db *mongo.Database) error {
 		}
 		err = repo.Update(context.TODO(), city)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed updating city: %w", err)
 		}
 	}
 	return nil
