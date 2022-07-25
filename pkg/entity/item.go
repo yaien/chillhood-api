@@ -47,6 +47,7 @@ func (p *Item) Size(label string) (*Size, error) {
 type ItemRepository interface {
 	Create(ctx context.Context, item *Item) error
 	CountByName(ctx context.Context, name string) (int64, error)
+	CountByNameIgnore(ctx context.Context, id ID, name string) (int64, error)
 	FindOneByID(ctx context.Context, id ID) (*Item, error)
 	FindOneActiveByID(ctx context.Context, id ID) (*Item, error)
 	FindOneBySlug(ctx context.Context, slug string) (*Item, error)

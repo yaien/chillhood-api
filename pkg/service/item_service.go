@@ -64,7 +64,7 @@ func (p *itemService) Update(ctx context.Context, item *entity.Item) error {
 	item.Slug = slug.Make(item.Name)
 	item.UpdatedAt = time.Now()
 
-	count, err := p.items.CountByName(ctx, item.Name)
+	count, err := p.items.CountByNameIgnore(ctx, item.ID, item.Name)
 	if err != nil {
 		return err
 	}
