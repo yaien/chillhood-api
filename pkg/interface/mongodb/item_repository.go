@@ -24,7 +24,7 @@ func (m *ItemRepository) CountByName(ctx context.Context, name string) (int64, e
 }
 
 func (m *ItemRepository) CountByNameIgnore(ctx context.Context, id primitive.ObjectID, name string) (int64, error) {
-	return m.collection.CountDocuments(ctx, bson.M{"name": name, "id": bson.M{"$ne": id}})
+	return m.collection.CountDocuments(ctx, bson.M{"name": name, "_id": bson.M{"$ne": id}})
 }
 
 func (m *ItemRepository) FindOneByID(ctx context.Context, id primitive.ObjectID) (*entity.Item, error) {
