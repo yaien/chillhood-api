@@ -56,6 +56,7 @@ func (s *SMTPConfig) Address() string {
 type Config struct {
 	Production bool
 	MongoURI   string
+	MongoDB    string
 	Address    string
 	BaseURL    *url.URL
 	Epayco     *EpaycoConfig
@@ -96,6 +97,7 @@ func load() *Config {
 	return &Config{
 		Production: os.Getenv("GO_ENV") == "production",
 		MongoURI:   os.Getenv("MONGO_URL"),
+		MongoDB:    os.Getenv("MONGO_DB"),
 		Address:    address(),
 		BaseURL:    baseURL(os.Getenv("BASE_URL")),
 		Epayco: &EpaycoConfig{

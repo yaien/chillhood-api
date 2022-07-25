@@ -2,8 +2,6 @@ package infrastructure
 
 import (
 	"context"
-	"net/url"
-	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,15 +9,11 @@ import (
 )
 
 // connect to mongo database
-func connect(rawurl string) (*mongo.Database, error) {
-	uri, err := url.Parse(rawurl)
-	if err != nil {
-		return nil, err
-	}
+func connect(rawUrl, dbname string) (*mongo.Database, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	opts := options.Client().ApplyURI(rawurl)
+	opts := options.Client().ApplyURI(rawUrl)
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		return nil, err
@@ -29,8 +23,7 @@ func connect(rawurl string) (*mongo.Database, error) {
 		return nil, err
 	}
 
-	path := strings.Replace(uri.Path, "/", "", 1)
-	db := client.Database(path)
+	db := client.Database(dbname)
 
 	return db, nil
 }

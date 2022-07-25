@@ -25,7 +25,7 @@ func NewApp() (*App, error) {
 
 	slackClient := slack.New(config.Slack.AccessToken)
 
-	db, err := connect(config.MongoURI)
+	db, err := connect(config.MongoURI, config.MongoDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed connecting to the database: %w", err)
 	}
