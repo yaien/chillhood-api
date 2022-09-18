@@ -1,6 +1,6 @@
 module github.com/yaien/clothes-store-api
 
-go 1.19
+go 1.18
 
 require (
 	github.com/dustin/go-humanize v1.0.0
