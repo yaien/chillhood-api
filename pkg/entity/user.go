@@ -11,14 +11,15 @@ import (
 type ID = primitive.ObjectID
 
 type User struct {
-	ID        ID        `bson:"_id" json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	Password  string    `json:"-"`
-	Role      string    `json:"role"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID         ID        `bson:"_id" json:"id"`
+	Name       string    `json:"name"`
+	Email      string    `json:"email"`
+	Phone      string    `json:"phone"`
+	Password   string    `json:"-"`
+	Role       string    `json:"role"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+	Reportable bool      `json:"reportable"`
 }
 
 func (u *User) HashPassword() error {
@@ -38,4 +39,5 @@ type UserRepository interface {
 	FindOneByID(ctx context.Context, id ID) (*User, error)
 	FindOneByEmail(ctx context.Context, email string) (*User, error)
 	Create(ctx context.Context, u *User) error
+	FindReportable(ctx context.Context) ([]*User, error)
 }

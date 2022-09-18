@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/yaien/clothes-store-api/pkg/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,6 +12,25 @@ import (
 
 type UserRepository struct {
 	collection *mongo.Collection
+}
+
+func (m *UserRepository) FindReportable(ctx context.Context) ([]*entity.User, error) {
+	var users []*entity.User
+	cursor, err := m.collection.Find(ctx, bson.M{"reportable": true})
+	if err != nil {
+		return nil, fmt.Errorf("failed executing find: %w", err)
+	}
+
+	for cursor.Next(ctx) {
+		var user entity.User
+		err = cursor.Decode(&user)
+		if err != nil {
+			return nil, fmt.Errorf("failed decoding: %w", err)
+		}
+		users = append(users, &user)
+	}
+
+	return users, nil
 }
 
 func (m *UserRepository) FindOneByID(ctx context.Context, id primitive.ObjectID) (*entity.User, error) {

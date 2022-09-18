@@ -39,6 +39,14 @@ type SlackConfig struct {
 	SaleUrl     string
 }
 
+type WhatsappConfig struct {
+	MessagesEndpoint     string
+	Token                string
+	Template             string
+	TemplateLanguageCode string
+	SaleUrl              string
+}
+
 type SMTPConfig struct {
 	Host     string
 	Port     string
@@ -64,6 +72,7 @@ type Config struct {
 	Client     *ClientConfig
 	Cloudinary *CloudinaryConfig
 	Slack      *SlackConfig
+	Whatsapp   *WhatsappConfig
 	SMTP       *SMTPConfig
 }
 
@@ -130,6 +139,13 @@ func load() *Config {
 			Password: os.Getenv("SMTP_PASSWORD"),
 			Sender:   os.Getenv("SMTP_SENDER"),
 			RefLink:  os.Getenv("SMTP_REF_LINK"),
+		},
+		Whatsapp: &WhatsappConfig{
+			MessagesEndpoint:     os.Getenv("WHATSAPP_MESSAGES_ENDPOINT"),
+			Token:                os.Getenv("WHATSAPP_ACCESS_TOKEN"),
+			Template:             os.Getenv("WHATSAPP_TEMPLATE"),
+			TemplateLanguageCode: os.Getenv("WHATSAPP_TEMPLATE_LANGUAGE_CODE"),
+			SaleUrl:              os.Getenv("WHATSAPP_SALE_URL"),
 		},
 	}
 }

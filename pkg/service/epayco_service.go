@@ -26,7 +26,7 @@ type epaycoService struct {
 	invoices InvoiceService
 	carts    CartService
 	guests   GuestService
-	slack    SlackService
+	notifier WhatsappService
 	emails   EmailService
 	config   *infrastructure.EpaycoConfig
 	baseURL  *url.URL
@@ -84,7 +84,7 @@ func (e *epaycoService) Process(payment *epayco.Payment) (*entity.Invoice, error
 			if err := e.guests.Reset(context.TODO(), invoice.GuestID); err != nil {
 				return nil, err
 			}
-			e.slack.NotifySale(invoice)
+			e.notifier.NotifySale(context.TODO(), invoice)
 			e.emails.NotifySale(invoice)
 		case epayco.Pending:
 			invoice.Status = entity.Pending
@@ -118,13 +118,13 @@ func NewEpaycoService(
 	invoiceSrv InvoiceService,
 	cartSrv CartService,
 	guestSrv GuestService,
-	slackSrv SlackService,
+	whatsappSrv WhatsappService,
 	emailSrv EmailService) EpaycoService {
 	return &epaycoService{
 		invoiceSrv,
 		cartSrv,
 		guestSrv,
-		slackSrv,
+		whatsappSrv,
 		emailSrv,
 		config,
 		baseURL,

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/slack-go/slack"
 	"github.com/yaien/clothes-store-api/pkg/entity"
@@ -10,7 +11,7 @@ import (
 )
 
 type SlackService interface {
-	NotifySale(invoice *entity.Invoice)
+	NotifySale(ctx context.Context, invoice *entity.Invoice)
 }
 
 type slackService struct {
@@ -18,7 +19,7 @@ type slackService struct {
 	config *infrastructure.SlackConfig
 }
 
-func (n *slackService) NotifySale(invoice *entity.Invoice) {
+func (n *slackService) NotifySale(ctx context.Context, invoice *entity.Invoice) {
 	name := invoice.Shipping.Name
 	ref := invoice.Ref
 	text := fmt.Sprintf("%s ha realizado una compra! (ref: %s)", name, ref)
@@ -36,7 +37,7 @@ func (n *slackService) NotifySale(invoice *entity.Invoice) {
 		}),
 	)
 	if err != nil {
-		log.Printf("failed sending slack notification for invoice (ref: %s): %s", ref, err.Error())
+		log.Printf("failed sending notifier notification for invoice (ref: %s): %s", ref, err.Error())
 	}
 }
 
