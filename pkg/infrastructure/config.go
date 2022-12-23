@@ -60,6 +60,17 @@ func (s *SMTPConfig) Address() string {
 	return fmt.Sprintf("%s:%s", s.Host, s.Port)
 }
 
+type NgrokConfig struct {
+	Enabled bool
+	Token   string
+}
+
+type P2PConfig struct {
+	Name   string
+	Key    string
+	Lookup []string
+}
+
 // Config -> environment variable settings
 type Config struct {
 	Production bool
@@ -74,6 +85,8 @@ type Config struct {
 	Slack      *SlackConfig
 	Whatsapp   *WhatsappConfig
 	SMTP       *SMTPConfig
+	Ngrok      *NgrokConfig
+	P2P        *P2PConfig
 }
 
 func address() string {
@@ -146,6 +159,15 @@ func load() *Config {
 			Template:             os.Getenv("WHATSAPP_TEMPLATE"),
 			TemplateLanguageCode: os.Getenv("WHATSAPP_TEMPLATE_LANGUAGE_CODE"),
 			SaleUrl:              os.Getenv("WHATSAPP_SALE_URL"),
+		},
+		Ngrok: &NgrokConfig{
+			Enabled: os.Getenv("NGROK_ENABLED") == "true",
+			Token:   os.Getenv("NGROK_AUTH_TOKEN"),
+		},
+		P2P: &P2PConfig{
+			Name:   os.Getenv("P2P_NAME"),
+			Key:    os.Getenv("P2P_KEY"),
+			Lookup: strings.Split(os.Getenv("P2P_LOOKUP"), ","),
 		},
 	}
 }

@@ -4,13 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/yaien/clothes-store-api/pkg/assets"
 	"github.com/yaien/clothes-store-api/pkg/entity"
 	"github.com/yaien/clothes-store-api/pkg/interface/mongodb"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/yaml.v2"
-	"time"
 )
 
 func populateCities(db *mongo.Database) error {
@@ -124,6 +128,76 @@ func populateUsers(db *mongo.Database) error {
 	return err
 }
 
+func populateIndexes(db *mongo.Database) error {
+	collections := []struct {
+		name    string
+		indexes []mongo.IndexModel
+	}{
+		{
+			name: "invoices",
+			indexes: []mongo.IndexModel{
+				{
+					Keys: bson.M{
+						"ref":            "text",
+						"shipping.email": "text",
+						"shipping.name":  "text",
+						"shipping.phone": "text",
+					},
+					Options: options.Index().SetName("search_invoices_text"),
+				},
+				{Keys: bson.M{"ref": 1}, Options: options.Index().SetUnique(true)},
+			},
+		},
+		{
+			name: "items",
+			indexes: []mongo.IndexModel{
+				{Keys: bson.M{"name": 1}, Options: options.Index().SetUnique(true)},
+				{Keys: bson.M{"slug": 1}, Options: options.Index().SetUnique(true)},
+				{Keys: bson.M{"name": "text"}},
+			},
+		},
+		{
+			name: "users",
+			indexes: []mongo.IndexModel{
+				{
+					Keys:    bson.M{"email": 1},
+					Options: options.Index().SetUnique(true),
+				},
+			},
+		},
+		{
+			name: "cities",
+			indexes: []mongo.IndexModel{
+				{
+					Keys:    bson.M{"name": "text", "province.name": "text"},
+					Options: options.Index().SetName("search_cities_text"),
+				},
+			},
+		},
+		{
+			name: "provinces",
+			indexes: []mongo.IndexModel{
+				{
+					Keys:    bson.M{"name": "text"},
+					Options: options.Index().SetName("search_cities_text"),
+				},
+			},
+		},
+	}
+
+	for _, c := range collections {
+		indexes := db.Collection(c.name).Indexes()
+		names, err := indexes.CreateMany(context.TODO(), c.indexes)
+		if err != nil {
+			fmt.Printf("create indexes failed on collection %s: %s\n", c.name, err)
+			continue
+		}
+		fmt.Printf("created indexes %s on collection %s\n", strings.Join(names, ", "), c.name)
+	}
+
+	return nil
+}
+
 func concat(fs ...func(db *mongo.Database) error) func(db *mongo.Database) error {
 	return func(db *mongo.Database) error {
 		for _, f := range fs {
@@ -136,7 +210,7 @@ func concat(fs ...func(db *mongo.Database) error) func(db *mongo.Database) error
 	}
 }
 
-var initial = concat(populateCities, populateUsers)
+var initial = concat(populateIndexes, populateCities, populateUsers)
 
 var migrations []*Migration
 
