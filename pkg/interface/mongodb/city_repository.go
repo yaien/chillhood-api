@@ -33,7 +33,7 @@ func (m *CityRepository) Search(ctx context.Context, opts entity.SearchCityOptio
 	if err != nil {
 		return nil, err
 	}
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(ctx) {
 		var city entity.City
 		err = cursor.Decode(&city)
 		if err != nil {

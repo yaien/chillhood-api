@@ -20,6 +20,7 @@ type services struct {
 	cities    service.CityService
 	provinces service.ProvinceService
 	slack     service.SlackService
+	whatsapp  service.WhatsappService
 	email     service.EmailService
 }
 
@@ -42,7 +43,8 @@ func bundle(app *infrastructure.App) *module {
 	guests := service.NewGuestService(mongodb.NewGuestRepository(app.DB))
 	invoices := service.NewInvoiceService(mongodb.NewMongoInvoiceRepository(app.DB))
 	slack := service.NewSlackService(app.Slack, app.Config.Slack)
-	epayco := service.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL, invoices, carts, guests, slack, email)
+	whatsapp := service.NewWhatsappService(app.Config.Whatsapp, users)
+	epayco := service.NewEpaycoService(app.Config.Epayco, app.Config.BaseURL, invoices, carts, guests, whatsapp, email)
 	tokens := service.NewTokenService(app.Config.Client, app.Config.JWT, users)
 	config := service.NewConfigService(app.Config)
 
@@ -59,6 +61,7 @@ func bundle(app *infrastructure.App) *module {
 			tokens:    tokens,
 			config:    config,
 			slack:     slack,
+			whatsapp:  whatsapp,
 			email:     email,
 		},
 		middleware: &middleware{

@@ -39,6 +39,14 @@ type SlackConfig struct {
 	SaleUrl     string
 }
 
+type WhatsappConfig struct {
+	MessagesEndpoint     string
+	Token                string
+	Template             string
+	TemplateLanguageCode string
+	SaleUrl              string
+}
+
 type SMTPConfig struct {
 	Host     string
 	Port     string
@@ -50,6 +58,17 @@ type SMTPConfig struct {
 
 func (s *SMTPConfig) Address() string {
 	return fmt.Sprintf("%s:%s", s.Host, s.Port)
+}
+
+type NgrokConfig struct {
+	Enabled bool
+	Token   string
+}
+
+type P2PConfig struct {
+	Name   string
+	Key    string
+	Lookup []string
 }
 
 // Config -> environment variable settings
@@ -64,7 +83,10 @@ type Config struct {
 	Client     *ClientConfig
 	Cloudinary *CloudinaryConfig
 	Slack      *SlackConfig
+	Whatsapp   *WhatsappConfig
 	SMTP       *SMTPConfig
+	Ngrok      *NgrokConfig
+	P2P        *P2PConfig
 }
 
 func address() string {
@@ -130,6 +152,22 @@ func load() *Config {
 			Password: os.Getenv("SMTP_PASSWORD"),
 			Sender:   os.Getenv("SMTP_SENDER"),
 			RefLink:  os.Getenv("SMTP_REF_LINK"),
+		},
+		Whatsapp: &WhatsappConfig{
+			MessagesEndpoint:     os.Getenv("WHATSAPP_MESSAGES_ENDPOINT"),
+			Token:                os.Getenv("WHATSAPP_ACCESS_TOKEN"),
+			Template:             os.Getenv("WHATSAPP_TEMPLATE"),
+			TemplateLanguageCode: os.Getenv("WHATSAPP_TEMPLATE_LANGUAGE_CODE"),
+			SaleUrl:              os.Getenv("WHATSAPP_SALE_URL"),
+		},
+		Ngrok: &NgrokConfig{
+			Enabled: os.Getenv("NGROK_ENABLED") == "true",
+			Token:   os.Getenv("NGROK_AUTH_TOKEN"),
+		},
+		P2P: &P2PConfig{
+			Name:   os.Getenv("P2P_NAME"),
+			Key:    os.Getenv("P2P_KEY"),
+			Lookup: strings.Split(os.Getenv("P2P_LOOKUP"), ","),
 		},
 	}
 }
